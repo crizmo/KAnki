@@ -38,12 +38,12 @@ KAnki is a spaced repetition flashcard application designed specifically for jai
 2. Connect your Kindle to a computer via USB
 3. Create a directory on your Kindle where you want to install KAnki
 4. Copy the entire contents of this repository to that directory5
-5. Ensure the directory structure is preserved, especially the `assets/fonts` directory
+5. Ensure the directory structure is preserved.
 6. Disconnect your Kindle and run the `kanki.sh` script using the terminal on your Kindle
 
 ## Running the Application
 
-1. Download And Unzip The Latest Release, Copy assets, kanki And kanki.sh To The documents Folder On Your Kindle, Then Run!
+1. Download And Unzip The Latest Release, Copy kanki And kanki.sh To The documents Folder On Your Kindle, Then Run!
 
 ## Development
 
@@ -51,14 +51,14 @@ KAnki is a spaced repetition flashcard application designed specifically for jai
 
 ```
 kanki.sh             # Startup script
-assets/
-  fonts/
-    japanese.ttf     # Japanese font file
 kanki/
   config.xml         # Application configuration
   index.html         # Main HTML file
   main.css           # Styles
   main.js            # Application logic
+  assets/
+    fonts/
+      japanese.ttf     # Japanese font file
   js/
     polyfill.min.js  # ES5 polyfills
     sdk.js           # Kindle-specific functions
