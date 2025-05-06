@@ -1,0 +1,157 @@
+/*===============================*/
+/*                               */
+/* Copyright Bluebotlaboratories */
+/*                               */
+/*===============================*/
+@font-face {
+  font-family: 'JapaneseFont';
+  src: url(../assets/fonts/japanese.ttf);
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: sans-serif;
+  background-color: #f5f5f5;
+}
+
+h1 {
+  text-align: center;
+  margin: 20px 0;
+}
+
+.progressBar, .levelBar {
+  text-align: center;
+  margin: 10px 0;
+  font-weight: bold;
+}
+
+#jlptFilterButtons {
+  text-align: center;
+  margin: 15px 0;
+}
+
+#jlptFilterButtons button {
+  margin: 0 5px;
+  padding: 5px 10px;
+}
+
+.card {
+  background-color: white;
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  margin: 20px auto;
+  max-width: 80%;
+  position: relative;
+}
+
+.jlptBadge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: #4285f4;
+  color: white;
+  padding: 3px 8px;
+  border-radius: 3px;
+  font-size: 0.8em;
+}
+
+.cardFront {
+  font-size: 2em;
+  font-weight: bold;
+  margin-bottom: 20px;
+  margin-top: 15px;
+  font-family: 'JapaneseFont', sans-serif;
+}
+
+.cardBack {
+  font-size: 1.5em;
+  margin-bottom: 10px;
+  padding-top: 15px;
+  border-top: 1px solid #eee;
+}
+
+.cardNotes {
+  font-size: 0.9em;
+  color: #666;
+  font-style: italic;
+}
+
+.buttonContainer {
+  text-align: center;
+  margin: 20px 0;
+}
+
+.buttonContainer button {
+  margin: 0 5px;
+  padding: 5px 10px;
+}
+
+#answerButtons button {
+  margin: 0 10px;
+  padding: 8px 15px;
+}
+
+.correctBtn {
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 3px;
+}
+
+.incorrectBtn {
+  background-color: #f44336;
+  color: white;
+  border: none;
+  border-radius: 3px;
+}
+
+.formGroup {
+  margin: 15px 0;
+}
+
+.formGroup label {
+  display: block;
+  margin-bottom: 5px;
+}
+
+.formGroup input, .formGroup select {
+  width: 90%;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 3px;
+}
+
+.footer {
+  text-align: center;
+  margin-top: 30px;
+  padding: 10px;
+  color: #888;
+  font-size: 0.8em;
+}
+
+.downloadButtons {
+  margin: 20px 0;
+  text-align: center;
+}
+
+.downloadButtons button {
+  margin: 5px;
+  padding: 5px 10px;
+  background-color: #e0e0e0;
+  border: 1px solid #999;
+  border-radius: 3px;
+}
+
+#loadingIndicator {
+  font-style: italic;
+}
+
+#statusMessage {
+  padding: 8px;
+  background-color: #f5f5f5;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  margin: 10px 0;
+}
