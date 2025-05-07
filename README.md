@@ -1,10 +1,13 @@
 # KAnki: Japanese Flashcard App for Kindle
 
 KAnki is a spaced repetition flashcard application designed specifically for jailbroken Kindle devices. Inspired by Anki, it helps users learn Japanese vocabulary through digital flashcards with a spaced repetition system.
+> Huge thanks to [PolishPenguin](https://github.com/polish-penguin-dev) for lending a hand — couldn’t do it without them!
+
 
 ## ⚠️ Project Status: Under Development
 
 **NOTE:** This project is currently in early development and doesn't work fully yet. Some features may be broken or incomplete. Actively looking for developers to contribute!
+
 
 ## Features
 
