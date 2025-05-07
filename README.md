@@ -13,7 +13,7 @@ KAnki is a spaced repetition flashcard application designed specifically for jai
 - Spaced repetition system to optimize learning
 - Japanese vocabulary flashcards with JLPT levels (N5-N4 included by default)
 - Built-in default deck with 100 vocabulary words (50 N5 and 50 N4)
-- Filtering by JLPT level (N5-N1)
+- Filtering by JLPT level (N5-N4)
 - Progress tracking
 
 ## Technical Limitations
