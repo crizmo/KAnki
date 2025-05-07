@@ -17,7 +17,7 @@ function log(logStuff) {
 
 // Simple font loader
 function loadJapaneseFont() {
-  var fontCSS = "@font-face { font-family: 'JapaneseFont'; src: url(/assets/fonts/japanese.ttf); }";
+  var fontCSS = "@font-face { font-family: 'JapaneseFont'; src: url(assets/fonts/japanese.ttf); }";
   var styleElement = document.createElement('style');
   styleElement.textContent = fontCSS;
   document.head.appendChild(styleElement);

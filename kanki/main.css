@@ -5,7 +5,7 @@
 /*===============================*/
 @font-face {
   font-family: 'JapaneseFont';
-  src: url(/assets/fonts/japanese.ttf);
+  src: url(assets/fonts/japanese.ttf);
 }
 
 body {
