@@ -54,9 +54,14 @@ function createDeck() {
   };
 }
 
-function createCard(front, back, notes, jlptLevel, level) {
+function createCard(front, reading, back, notes, jlptLevel, level) {
+  var displayText = front;
+  if (reading) {
+    displayText = front + " (" + reading + ")";
+  }
+  
   return {
-    front: toEscapeCodes(front), // Convert to HTML entities
+    front: toEscapeCodes(displayText),
     back: back,
     notes: notes || "",
     jlptLevel: jlptLevel || "N5",
@@ -65,7 +70,6 @@ function createCard(front, back, notes, jlptLevel, level) {
     history: []
   };
 }
-
 // Default Japanese deck with words from vocabulary.js
 function createDefaultDeck() {
   var deck = createDeck();
@@ -73,12 +77,12 @@ function createDefaultDeck() {
   // Add words from the JLPT_VOCABULARY object
   // First, check if JLPT_VOCABULARY is defined
   if (typeof JLPT_VOCABULARY !== 'undefined') {
-    // Add N5 words
     if (JLPT_VOCABULARY.N5) {
-      for (var i = 0; i < JLPT_VOCABULARY.N5.length && i < 20; i++) { // Limit to 20 words
+      for (var i = 0; i < JLPT_VOCABULARY.N5.length; i++) {
         var word = JLPT_VOCABULARY.N5[i];
         deck.cards.push(createCard(
           word.front, 
+          word.reading,
           word.back, 
           word.notes, 
           "N5", 
@@ -89,10 +93,11 @@ function createDefaultDeck() {
     
     // Add N4 words
     if (JLPT_VOCABULARY.N4) {
-      for (var j = 0; j < JLPT_VOCABULARY.N4.length && j < 10; j++) { // Limit to 10 words
+      for (var j = 0; j < JLPT_VOCABULARY.N4.length; j++) {
         var word = JLPT_VOCABULARY.N4[j];
         deck.cards.push(createCard(
           word.front, 
+          word.reading,
           word.back, 
           word.notes, 
           "N4", 
@@ -106,30 +111,74 @@ function createDefaultDeck() {
     // Fallback if vocabulary file isn't loaded - basic set of cards
     log("Warning: JLPT_VOCABULARY not found, using minimal deck");
     
-    // N5 Level Cards - minimal set
-    deck.cards.push(createCard("こんにちは", "Hello", "Greeting", "N5", 0));
-    deck.cards.push(createCard("ありがとう", "Thank you", "Gratitude", "N5", 0));
-    deck.cards.push(createCard("さようなら", "Goodbye", "Parting", "N5", 0));
-    deck.cards.push(createCard("はい", "Yes", "Affirmation", "N5", 0));
-    deck.cards.push(createCard("いいえ", "No", "Negation", "N5", 0));
-    
-    // N4 Level Cards - minimal set
-    deck.cards.push(createCard("急ぐ", "To hurry", "Verb", "N4", 0));
-    deck.cards.push(createCard("同じ", "Same", "Adjective", "N4", 0));
-    deck.cards.push(createCard("違う", "Different", "Verb", "N4", 0));
+    deck.cards.push(createCard("こんにちは", null, "Hello", "Greeting", "N5", 0));
+    deck.cards.push(createCard("ありがとう", null, "Thank you", "Gratitude", "N5", 0));
+    deck.cards.push(createCard("さようなら", null, "Goodbye", "Parting", "N5", 0));
+    deck.cards.push(createCard("はい", null, "Yes", "Affirmation", "N5", 0));
+    deck.cards.push(createCard("いいえ", null, "No", "Negation", "N5", 0));
+    deck.cards.push(createCard("お願いします", null, "Please", "Request", "N5", 0));
+    deck.cards.push(createCard("すみません", null, "Excuse me / Sorry", "Apology", "N5", 0));
+    deck.cards.push(createCard("いくらですか", null, "How much is it?", "Question", "N5", 0));
+    deck.cards.push(createCard("わかりません", null, "I don't understand", "Phrase", "N5", 0));
+    deck.cards.push(createCard("あなた", null, "You", "Pronoun", "N5", 0));
+    deck.cards.push(createCard("水", "みず", "Water", "Noun", "N5", 0));
+    deck.cards.push(createCard("人", "ひと", "Person", "Noun", "N5", 0));
+    deck.cards.push(createCard("本", "ほん", "Book", "Noun", "N5", 0));
+    deck.cards.push(createCard("一", "いち", "One", "Number", "N5", 0));
+    deck.cards.push(createCard("二", "に", "Two", "Number", "N5", 0));
+    deck.cards.push(createCard("三", "さん", "Three", "Number", "N5", 0));
+    deck.cards.push(createCard("四", "よん", "Four", "Number", "N5", 0));
+    deck.cards.push(createCard("五", "ご", "Five", "Number", "N5", 0));
   }
   
   return deck;
 }
 
-// Update status message
-function updateStatusMessage(message) {
+// Update status message with optional confirmation buttons
+function updateStatusMessage(message, isConfirmation, onConfirm, onCancel) {
   var statusElement = document.getElementById("statusMessage");
-  if (statusElement) {
-    statusElement.textContent = message;
-    statusElement.style.display = "block";
+  if (!statusElement) return;
+  
+  // Clear existing content
+  statusElement.innerHTML = '';
+  
+  // Add message
+  var messageEl = document.createElement("div");
+  messageEl.className = "statusText";
+  messageEl.textContent = message;
+  statusElement.appendChild(messageEl);
+  
+  // If this is a confirmation, add yes/no buttons
+  if (isConfirmation && onConfirm) {
+    var buttonContainer = document.createElement("div");
+    buttonContainer.className = "statusButtons";
     
-    // Hide after 3 seconds
+    var yesButton = document.createElement("button");
+    yesButton.textContent = "Yes";
+    yesButton.className = "confirmBtn";
+    yesButton.onclick = function() {
+      statusElement.style.display = "none";
+      onConfirm();
+    };
+    
+    var noButton = document.createElement("button");
+    noButton.textContent = "No";
+    noButton.className = "cancelBtn";
+    noButton.onclick = function() {
+      statusElement.style.display = "none";
+      if (onCancel) onCancel();
+    };
+    
+    buttonContainer.appendChild(yesButton);
+    buttonContainer.appendChild(noButton);
+    statusElement.appendChild(buttonContainer);
+  }
+  
+  // Display the message
+  statusElement.style.display = "block";
+  
+  // Auto-hide for non-confirmation messages
+  if (!isConfirmation) {
     setTimeout(function() {
       statusElement.style.display = "none";
     }, 3000);
@@ -321,33 +370,37 @@ function onPageLoad() {
 
 // Reset progress
 function resetProgress() {
-  if (confirm("Are you sure you want to reset all cards' progress?")) {
-    deck.cards.forEach(function(card) {
-      card.level = 0;
-      card.nextReview = new Date().getTime();
-      card.history = [];
-    });
-    
-    currentCardIndex = 0;
-    correctAnswers = 0;
-    incorrectAnswers = 0;
-    
-    displayCurrentCard(false);
-    
-    log("Progress reset");
-  }
+  updateStatusMessage("Are you sure you want to reset all cards' progress?", true, 
+    function() { // onConfirm
+      for (var i = 0; i < deck.cards.length; i++) {
+        deck.cards[i].level = 0;
+        deck.cards[i].nextReview = new Date().getTime();
+        deck.cards[i].history = [];
+      }
+      
+      currentCardIndex = 0;
+      correctAnswers = 0;
+      incorrectAnswers = 0;
+      
+      displayCurrentCard(false);
+      updateStatusMessage("Progress has been reset", false);
+      log("Progress reset");
+    }
+  );
 }
 
 // Reset all
 function resetAll() {
-  if (confirm("Are you sure you want to reset all data? This will delete all cards and progress.")) {
-    deck = createDefaultDeck();
-    currentCardIndex = 0;
-    correctAnswers = 0;
-    incorrectAnswers = 0;
-    
-    displayCurrentCard(false);
-    
-    log("Complete reset performed");
-  }
+  updateStatusMessage("Are you sure you want to reset all data? This will delete all cards and progress.", true,
+    function() { // onConfirm
+      deck = createDefaultDeck();
+      currentCardIndex = 0;
+      correctAnswers = 0;
+      incorrectAnswers = 0;
+      
+      displayCurrentCard(false);
+      updateStatusMessage("All data has been reset", false);
+      log("Complete reset performed");
+    }
+  );
 }

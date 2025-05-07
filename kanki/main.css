@@ -151,3 +151,49 @@ h1 {
   color: #666;
   font-size: 0.8em;
 }
+
+/* Status message styling */
+#statusMessage {
+  position: fixed;
+  top: 200px;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  width: 250px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  padding: 15px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+  z-index: 100;
+  text-align: center;
+}
+
+#statusMessage .statusText {
+  margin-bottom: 15px;
+  font-size: 1.1em;
+}
+
+#statusMessage .statusButtons {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+#statusMessage button {
+  padding: 8px 15px;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  margin: 0 5px;
+}
+
+#statusMessage .confirmBtn {
+  background-color: #4caf50;
+  color: white;
+}
+
+#statusMessage .cancelBtn {
+  background-color: #f44336;
+  color: white;
+}

@@ -4,18 +4,15 @@ KAnki is a spaced repetition flashcard application designed specifically for jai
 > Huge thanks to [PolishPenguin](https://github.com/polish-penguin-dev) for lending a hand — couldn’t do it without them!
 
 
-## ⚠️ Project Status: Under Development
+## ⚠️ Project Status: Active Development
 
-**NOTE:** This project is currently in early development and doesn't work fully yet. Some features may be broken or incomplete. Actively looking for developers to contribute!
-
+**NOTE:** This project is now functional, with key features like vocabulary flashcards and JLPT level filtering working as intended. Contributions are still welcome to enhance the app further!
 
 ## Features
 
 - Spaced repetition system to optimize learning
-- Japanese vocabulary flashcards with JLPT levels
-- Built-in default deck with basic vocabulary
-- Option to download additional JLPT vocabulary from an online API
-- Ability to add custom flashcards
+- Japanese vocabulary flashcards with JLPT levels (N5-N4 included by default)
+- Built-in default deck with 100 vocabulary words (50 N5 and 50 N4)
 - Filtering by JLPT level (N5-N1)
 - Progress tracking
 
@@ -24,8 +21,6 @@ KAnki is a spaced repetition flashcard application designed specifically for jai
 - The app is designed for jailbroken Kindle devices with very limited browser capabilities
 - Uses older ES5 JavaScript only (no modern JS features)
 - Limited CSS support (no flexbox, grid, CSS variables, etc.)
-- No fetch API support (uses XMLHttpRequest instead)
-- Japanese font rendering requires a custom font
 
 ## Setup Instructions
 
@@ -35,18 +30,17 @@ KAnki is a spaced repetition flashcard application designed specifically for jai
 - Access to the Kindle's filesystem
 - Basic knowledge of file transfer to Kindle
 
-### Installation
+### Running the Application
 
 1. Clone this repository or download it as a ZIP file
 2. Connect your Kindle to a computer via USB
-3. Create a directory on your Kindle where you want to install KAnki
-4. Copy the entire contents of this repository to that directory5
-5. Ensure the directory structure is preserved.
-6. Disconnect your Kindle and run the `kanki.sh` script using the terminal on your Kindle
-
-## Running the Application
-
-1. Download And Unzip The Latest Release, Copy kanki And kanki.sh To The documents Folder On Your Kindle, Then Run!
+3. Unzip the downloaded file ( Make sure the name is KAnki ) 
+4. Copy the KAnki folder and the `kanki.sh` script to the `documents` folder on your Kindle
+  - The KAnki folder should contain all the necessary files and subdirectories
+  - The `kanki.sh` script is the entry point for the application
+5. And done ! 
+  - Disconnect your Kindle from the computer
+6. Open the Kindle's home screen and run the KAnki app
 
 ## Development
 
@@ -78,29 +72,9 @@ kanki/
 ## Known Issues
 
 - Japanese font not loading properly.
-- API connectivity may be unreliable on some Kindle models
 - UI rendering issues due to Kindle's limited CSS support
-- Some JLPT levels may not download correctly
-- Heavy lag , alert dont work
-
-## Call for Developers
-
-We're actively looking for developers who are interested in:
-
-- Improving Kindle browser compatibility
-- Enhancing the spaced repetition algorithm
-- Adding offline vocabulary datasets
-- Fixing font loading issues
-- Improving the overall UI/UX within Kindle's limitations
-
-If you're interested in contributing, please feel free to:
-- Fork the repository
-- Submit pull requests
-- Open issues for bugs or feature suggestions
-- Contact the maintainers for more information
 
 ## Acknowledgements
 
 - Inspired by the Anki spaced repetition software
-- Uses JLPT vocabulary data from the jlpt-vocab-api
 - Special thanks to the Kindle jailbreak community
