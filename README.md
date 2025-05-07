@@ -36,10 +36,7 @@ KAnki is a spaced repetition flashcard application designed specifically for jai
 2. Connect your Kindle to a computer via USB
 3. Unzip the downloaded file ( Make sure the name is KAnki ) 
 4. Copy the KAnki folder and the `kanki.sh` script to the `documents` folder on your Kindle
-  - The KAnki folder should contain all the necessary files and subdirectories
-  - The `kanki.sh` script is the entry point for the application
-5. And done ! 
-  - Disconnect your Kindle from the computer
+5. And done ! Disconnect your Kindle from the computer
 6. Open the Kindle's home screen and run the KAnki app
 
 ## Development
