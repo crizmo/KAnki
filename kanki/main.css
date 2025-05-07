@@ -5,7 +5,10 @@
 /*===============================*/
 @font-face {
   font-family: 'JapaneseFont';
-  src: url(assets/fonts/japanese.ttf);
+  src: url('assets/fonts/japanese.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: block;
 }
 
 body {
@@ -78,6 +81,25 @@ h1 {
   font-style: italic;
 }
 
+#showAnswerBtn button, .correctBtn, .incorrectBtn {
+  padding: 10px 20px;
+  margin: 5px;
+  font-size: 1em;
+  cursor: pointer;
+}
+
+.correctBtn {
+  background-color: #4caf50;
+  color: white;
+  border: none;
+}
+
+.incorrectBtn {
+  background-color: #f44336;
+  color: white;
+  border: none;
+}
+
 .buttonContainer {
   text-align: center;
   margin: 20px 0;
@@ -88,70 +110,44 @@ h1 {
   padding: 5px 10px;
 }
 
-#answerButtons button {
-  margin: 0 10px;
-  padding: 8px 15px;
-}
-
-.correctBtn {
-  background-color: #4caf50;
-  color: white;
-  border: none;
-  border-radius: 3px;
-}
-
-.incorrectBtn {
-  background-color: #f44336;
-  color: white;
-  border: none;
-  border-radius: 3px;
-}
-
-.formGroup {
-  margin: 15px 0;
-}
-
-.formGroup label {
-  display: block;
-  margin-bottom: 5px;
-}
-
-.formGroup input, .formGroup select {
-  width: 90%;
-  padding: 8px;
-  border: 1px solid #ddd;
-  border-radius: 3px;
-}
-
-.footer {
-  text-align: center;
-  margin-top: 30px;
-  padding: 10px;
-  color: #888;
-  font-size: 0.8em;
-}
-
 .downloadButtons {
-  margin: 20px 0;
   text-align: center;
+  margin: 15px 0;
 }
 
 .downloadButtons button {
   margin: 5px;
   padding: 5px 10px;
-  background-color: #e0e0e0;
-  border: 1px solid #999;
-  border-radius: 3px;
 }
 
-#loadingIndicator {
-  font-style: italic;
+#addCardForm {
+  background-color: white;
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  margin: 20px auto;
+  max-width: 80%;
 }
 
-#statusMessage {
+.formGroup {
+  margin-bottom: 15px;
+}
+
+.formGroup label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.formGroup input, .formGroup select {
+  width: 100%;
   padding: 8px;
-  background-color: #f5f5f5;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  margin: 10px 0;
+  box-sizing: border-box;
+}
+
+.footer {
+  text-align: center;
+  margin-top: 30px;
+  color: #666;
+  font-size: 0.8em;
 }

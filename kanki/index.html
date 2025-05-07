@@ -23,85 +23,39 @@
   <h1 id="title">KAnki</h1>
   <div style="text-align: center;">
     <div id="progressDisplay" class="progressBar"></div>
-    <div id="levelDisplay" class="levelBar">JLPT Level: All Levels</div>
-    
-    <div id="jlptFilterButtons">
-      <button onclick="changeJlptLevel('all')">All</button>
-      <button onclick="changeJlptLevel('N5')">N5</button>
-      <button onclick="changeJlptLevel('N4')">N4</button>
-      <button onclick="changeJlptLevel('N3')">N3</button>
-      <button onclick="changeJlptLevel('N2')">N2</button>
-      <button onclick="changeJlptLevel('N1')">N1</button>
+    <div id="levelDisplay" class="levelDisplay"></div>
+  </div>
+  
+  <div id="jlptLevelButtons" class="buttonContainer">
+    <button onclick="changeJlptLevel('all')">All Levels</button>
+    <button onclick="changeJlptLevel('N5')">N5</button>
+    <button onclick="changeJlptLevel('N4')">N4</button>
+  </div>
+  
+  <div id="mainContainer">
+    <div id="statusMessage" style="display: none;"></div>
+    <div id="cardContainer">
+      <!-- Cards will be displayed here -->
     </div>
     
-    <div id="cardContainer"></div>
-    
-    <div id="showAnswerBtn" style="text-align: center;">
+    <div id="showAnswerBtn" class="buttonContainer">
       <button onclick="showAnswer()">Show Answer</button>
     </div>
     
-    <div id="answerButtons" style="text-align: center; display: none;">
+    <div id="answerButtons" class="buttonContainer" style="display: none;">
       <button onclick="answerCard(false)" class="incorrectBtn">Incorrect</button>
       <button onclick="answerCard(true)" class="correctBtn">Correct</button>
     </div>
     
-    <div id="statusMessage" style="display: none; margin: 10px 0; text-align: center; font-weight: bold;"></div>
-    <div id="loadingIndicator" style="display: none; margin: 10px 0; text-align: center;">Loading...</div>
-    
     <div class="buttonContainer">
-      <button onclick="showAddCardForm()">Add Card</button>
       <button onclick="resetProgress()">Reset Progress</button>
       <button onclick="resetAll()">Reset All Data</button>
-    </div>
-    
-    <div class="downloadButtons">
-      <button onclick="downloadJlptVocabulary('N5')">Get N5 Words</button>
-      <button onclick="downloadJlptVocabulary('N4')">Get N4 Words</button>
-      <button onclick="downloadJlptVocabulary('N3')">Get N3 Words</button>
-      <button onclick="downloadJlptVocabulary('N2')">Get N2 Words</button>
-      <button onclick="downloadJlptVocabulary('N1')">Get N1 Words</button>
-    </div>
-    
-    <div id="addCardForm" style="display: none;">
-      <h2>Add New Card</h2>
-      <div class="formGroup">
-        <label>Front (Japanese):</label>
-        <input type="text" id="newCardFront">
-      </div>
-      <div class="formGroup">
-        <label>Back (English):</label>
-        <input type="text" id="newCardBack">
-      </div>
-      <div class="formGroup">
-        <label>Notes (Part of speech, etc):</label>
-        <input type="text" id="newCardNotes">
-      </div>
-      <div class="formGroup">
-        <label>JLPT Level:</label>
-        <select id="newCardJlptLevel">
-          <option value="N5">N5</option>
-          <option value="N4">N4</option>
-          <option value="N3">N3</option>
-          <option value="N2">N2</option>
-          <option value="N1">N1</option>
-        </select>
-      </div>
-      <div class="buttonContainer">
-        <button onclick="addNewCard()">Save Card</button>
-        <button onclick="hideAddCardForm()">Cancel</button>
-      </div>
+      <p>&#12371;&#12435;&#12395;&#12385;&#12399;&#12364;&#12354;&#12394;&#65281;</p>
     </div>
   </div>
   
   <div class="footer">
     <p>v0.3.0</p>
   </div>
-
-  <script>
-    // Save deck when window unloads
-    window.addEventListener('beforeunload', function() {
-      saveFlashcardDeck();
-    });
-  </script>
 </body>
 </html>

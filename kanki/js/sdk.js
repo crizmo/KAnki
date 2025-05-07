@@ -103,34 +103,3 @@ function joinPaths(path1, path2) {
 
   return path1 + path2;
 }
-
-// Add new function to fetch vocabulary from the API using XMLHttpRequest
-function fetchVocabulary(level, callback) {
-  var url = level 
-    ? "https://jlpt-vocab-api.vercel.app/api/words/all?level=" + encodeURIComponent(level)
-    : "https://jlpt-vocab-api.vercel.app/api/words/all";
-  
-  var xhr = new XMLHttpRequest();
-  xhr.open('GET', url, true);
-  
-  xhr.onreadystatechange = function() {
-    if (xhr.readyState === 4) {
-      if (xhr.status === 200) {
-        try {
-          var data = JSON.parse(xhr.responseText);
-          callback(null, data);
-        } catch (error) {
-          callback("Error parsing JSON: " + error.message, null);
-        }
-      } else {
-        callback("Error with status: " + xhr.status, null);
-      }
-    }
-  };
-  
-  xhr.onerror = function() {
-    callback("Network error occurred", null);
-  };
-  
-  xhr.send();
-}

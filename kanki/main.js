@@ -4,39 +4,45 @@ var correctAnswers = 0;
 var incorrectAnswers = 0;
 var deck = null;
 var currentJlptLevel = "all"; // Default to show all cards
-var isLoadingVocabulary = false;
 var fontLoaded = false;
+
+// Convert Japanese characters to HTML entities
+function toEscapeCodes(str) {
+  var result = "";
+  for (var i = 0; i < str.length; i++) {
+    var charCode = str.charCodeAt(i);
+    if (charCode > 127) {
+      result += "&#" + charCode + ";";
+    } else {
+      result += str.charAt(i);
+    }
+  }
+  return result;
+}
 
 // The logging function
 function log(logStuff) {
-  var p = document.createElement("p");
-  p.innerText = logStuff.toString();
-  document.getElementById("log").appendChild(p);
+  var logElement = document.getElementById("log");
+  if (logElement) {
+    logElement.innerHTML += "<p>" + logStuff + "</p>";
+  }
   console.log(logStuff);
 }
 
-// Simple font loader
 function loadJapaneseFont() {
-  var fontCSS = "@font-face { font-family: 'JapaneseFont'; src: url(assets/fonts/japanese.ttf); }";
+  log("Loading Japanese font...");
+  
+  // Force font loading
+  var fontCSS = "@font-face { font-family: 'JapaneseFont'; src: url('assets/fonts/japanese.ttf') format('truetype'); font-weight: normal; font-style: normal; font-display: block; }";
   var styleElement = document.createElement('style');
   styleElement.textContent = fontCSS;
   document.head.appendChild(styleElement);
   
-  // Create a test element with Japanese text
-  var testElement = document.createElement('div');
-  testElement.style.fontFamily = 'JapaneseFont, sans-serif';
-  testElement.style.visibility = 'hidden';
-  testElement.style.position = 'absolute';
-  testElement.style.top = '-1000px';
-  testElement.textContent = 'こんにちは';
-  document.body.appendChild(testElement);
-  
-  // Wait a bit for font to load
+  // Wait longer for Kindle's slower processing
   setTimeout(function() {
     fontLoaded = true;
-    testElement.remove();
     log("Japanese font loading completed");
-  }, 1000);
+  }, 2000);
 }
 
 // Create flashcard deck data structure
@@ -48,10 +54,9 @@ function createDeck() {
   };
 }
 
-// Create a new card
 function createCard(front, back, notes, jlptLevel, level) {
   return {
-    front: front,
+    front: toEscapeCodes(front), // Convert to HTML entities
     back: back,
     notes: notes || "",
     jlptLevel: jlptLevel || "N5",
@@ -70,7 +75,7 @@ function createDefaultDeck() {
   if (typeof JLPT_VOCABULARY !== 'undefined') {
     // Add N5 words
     if (JLPT_VOCABULARY.N5) {
-      for (var i = 0; i < JLPT_VOCABULARY.N5.length; i++) {
+      for (var i = 0; i < JLPT_VOCABULARY.N5.length && i < 20; i++) { // Limit to 20 words
         var word = JLPT_VOCABULARY.N5[i];
         deck.cards.push(createCard(
           word.front, 
@@ -84,7 +89,7 @@ function createDefaultDeck() {
     
     // Add N4 words
     if (JLPT_VOCABULARY.N4) {
-      for (var j = 0; j < JLPT_VOCABULARY.N4.length; j++) {
+      for (var j = 0; j < JLPT_VOCABULARY.N4.length && j < 10; j++) { // Limit to 10 words
         var word = JLPT_VOCABULARY.N4[j];
         deck.cards.push(createCard(
           word.front, 
@@ -117,135 +122,51 @@ function createDefaultDeck() {
   return deck;
 }
 
-// Fetch vocabulary from the API
-function fetchVocabularyFromAPI(level) {
-  if (isLoadingVocabulary) {
-    return;
-  }
-  
-  isLoadingVocabulary = true;
-  updateStatusMessage("Fetching vocabulary from API...");
-  
-  // Show loading indicator
-  document.getElementById("loadingIndicator").style.display = "block";
-  
-  fetchVocabulary(level, function(error, data) {
-    isLoadingVocabulary = false;
-    document.getElementById("loadingIndicator").style.display = "none";
-    
-    if (error) {
-      log("Error fetching vocabulary: " + error);
-      updateStatusMessage("Failed to fetch vocabulary. Please try again.");
-      return;
-    }
-    
-    if (!data || data.length === 0) {
-      log("No vocabulary data returned from API");
-      updateStatusMessage("No vocabulary found for selected level.");
-      return;
-    }
-    
-    log("Successfully fetched " + data.length + " vocabulary items");
-    updateStatusMessage("Successfully fetched " + data.length + " words. Adding to deck...");
-    
-    // Process the vocabulary data
-    var addedCount = 0;
-    for (var i = 0; i < data.length; i++) {
-      var word = data[i];
-      
-      // Check if this word already exists in the deck
-      var exists = false;
-      for (var j = 0; j < deck.cards.length; j++) {
-        if (deck.cards[j].front === word.word) {
-          exists = true;
-          break;
-        }
-      }
-      
-      // Add the word if it doesn't exist
-      if (!exists) {
-        var jlptLevel = "N5"; // Default
-        if (word.level) {
-          jlptLevel = "N" + word.level;
-        }
-        
-        deck.cards.push(createCard(
-          word.word,
-          word.meaning,
-          word.type || "",
-          jlptLevel,
-          0
-        ));
-        addedCount++;
-      }
-    }
-    
-    // Save the updated deck
-    saveFlashcardDeck();
-    
-    // Update UI
-    updateStatusMessage("Added " + addedCount + " new vocabulary words to your deck!");
-    displayCurrentCard(false);
-  });
-}
-
 // Update status message
 function updateStatusMessage(message) {
   var statusElement = document.getElementById("statusMessage");
-  statusElement.textContent = message;
-  statusElement.style.display = "block";
-  
-  // Hide after 5 seconds
-  setTimeout(function() {
-    statusElement.style.display = "none";
-  }, 5000);
+  if (statusElement) {
+    statusElement.textContent = message;
+    statusElement.style.display = "block";
+    
+    // Hide after 3 seconds
+    setTimeout(function() {
+      statusElement.style.display = "none";
+    }, 3000);
+  }
 }
 
 // Spaced repetition algorithm (simplified SM-2)
 function calculateNextReview(card, wasCorrect) {
   var now = new Date().getTime();
   
-  // Record review in history
+  // Update card history
   card.history.push({
     date: now,
-    result: wasCorrect
+    correct: wasCorrect
   });
   
   if (wasCorrect) {
-    // Increase level for correct answers
-    card.level += 1;
-    
-    // Calculate next review time based on level
-    var hoursUntilNextReview = 0;
-    
-    switch (card.level) {
-      case 1:
-        hoursUntilNextReview = 4;
-        break;
-      case 2:
-        hoursUntilNextReview = 8;
-        break;
-      case 3:
-        hoursUntilNextReview = 24;
-        break;
-      case 4:
-        hoursUntilNextReview = 72;
-        break;
-      case 5:
-        hoursUntilNextReview = 168;
-        break;
-      default:
-        hoursUntilNextReview = Math.pow(2, Math.min(card.level, 15)) * 24;
-    }
-    
-    card.nextReview = now + (hoursUntilNextReview * 60 * 60 * 1000);
+    // Increase card level (max 5)
+    card.level = Math.min(5, card.level + 1);
   } else {
-    // Reset level for incorrect answers
-    card.level = Math.max(0, card.level - 1);
-    
-    // Schedule for review soon (30 minutes)
-    card.nextReview = now + (30 * 60 * 1000);
+    // Reset to level 0
+    card.level = 0;
   }
+  
+  // Calculate next review time based on level
+  var intervalHours;
+  switch (card.level) {
+    case 0: intervalHours = 0.1; break; // 6 minutes
+    case 1: intervalHours = 1; break;   // 1 hour
+    case 2: intervalHours = 6; break;   // 6 hours
+    case 3: intervalHours = 24; break;  // 1 day
+    case 4: intervalHours = 72; break;  // 3 days
+    case 5: intervalHours = 168; break; // 1 week
+    default: intervalHours = 0.1;
+  }
+  
+  card.nextReview = now + (intervalHours * 60 * 60 * 1000);
 }
 
 // Get cards due for review (filtered by JLPT level if applicable)
@@ -287,7 +208,8 @@ function displayCurrentCard(showAnswer) {
   
   var frontElement = document.createElement("div");
   frontElement.className = "cardFront";
-  frontElement.textContent = card.front;
+  // Use innerHTML to render the HTML entities
+  frontElement.innerHTML = card.front;
   frontElement.style.fontFamily = "JapaneseFont, sans-serif";
   
   cardElement.appendChild(levelBadge);
@@ -368,9 +290,6 @@ function answerCard(wasCorrect) {
   // Move to next card
   currentCardIndex++;
   
-  // Save deck
-  saveFlashcardDeck();
-  
   // Display next card
   displayCurrentCard(false);
 }
@@ -383,81 +302,6 @@ function changeJlptLevel(level) {
   displayCurrentCard(false);
 }
 
-// Add a new card to the deck
-function addNewCard() {
-  var frontText = document.getElementById("newCardFront").value.trim();
-  var backText = document.getElementById("newCardBack").value.trim();
-  var notesText = document.getElementById("newCardNotes").value.trim();
-  var jlptLevel = document.getElementById("newCardJlptLevel").value;
-  
-  if (frontText === "" || backText === "") {
-    alert("Front and back text are required!");
-    return;
-  }
-  
-  deck.cards.push(createCard(frontText, backText, notesText, jlptLevel, 0));
-  
-  // Clear form
-  document.getElementById("newCardFront").value = "";
-  document.getElementById("newCardBack").value = "";
-  document.getElementById("newCardNotes").value = "";
-  
-  // Hide form
-  document.getElementById("addCardForm").style.display = "none";
-  
-  // Save deck
-  saveFlashcardDeck();
-  
-  log("Added new card: " + frontText + " (" + jlptLevel + ")");
-  
-  // Update display
-  displayCurrentCard(false);
-}
-
-// Show the add card form
-function showAddCardForm() {
-  document.getElementById("addCardForm").style.display = "block";
-}
-
-// Hide the add card form
-function hideAddCardForm() {
-  document.getElementById("addCardForm").style.display = "none";
-}
-
-// Save deck to localStorage
-function saveFlashcardDeck() {
-  try {
-    window.localStorage.setItem("com.bluebotlaboratories.kanki.deck", 
-        JSON.stringify(deck));
-    log("Deck saved successfully");
-  } catch (e) {
-    log("Error saving deck: " + e.message);
-  }
-}
-
-// Load deck from localStorage
-function loadFlashcardDeck() {
-  try {
-    var savedDeck = window.localStorage.getItem("com.bluebotlaboratories.kanki.deck");
-    if (savedDeck) {
-      deck = JSON.parse(savedDeck);
-      
-      // Ensure jlptLevel is set on older cards
-      deck.cards.forEach(function(card) {
-        if (!card.jlptLevel) {
-          card.jlptLevel = "N5";
-        }
-      });
-      
-      log("Deck loaded successfully");
-      return true;
-    }
-  } catch (e) {
-    log("Error loading deck: " + e.message);
-  }
-  return false;
-}
-
 // Initialize app on page load
 function onPageLoad() {
   log("Application initializing...");
@@ -465,18 +309,12 @@ function onPageLoad() {
   // Load Japanese font
   loadJapaneseFont();
   
-  // Initialize deck
-  if (!loadFlashcardDeck()) {
-    deck = createDefaultDeck();
-    saveFlashcardDeck();
-    log("Created new default deck");
-  }
+  // Always create a new default deck
+  deck = createDefaultDeck();
+  log("Created new default deck");
   
   // Display first card
   displayCurrentCard(false);
-  
-  // Hide add card form initially
-  document.getElementById("addCardForm").style.display = "none";
   
   log("Application initialized");
 }
@@ -494,7 +332,6 @@ function resetProgress() {
     correctAnswers = 0;
     incorrectAnswers = 0;
     
-    saveFlashcardDeck();
     displayCurrentCard(false);
     
     log("Progress reset");
@@ -509,16 +346,8 @@ function resetAll() {
     correctAnswers = 0;
     incorrectAnswers = 0;
     
-    saveFlashcardDeck();
     displayCurrentCard(false);
     
     log("Complete reset performed");
-  }
-}
-
-// Function to download vocabulary from API
-function downloadJlptVocabulary(level) {
-  if (confirm("Download JLPT " + level + " vocabulary from internet? This requires an internet connection.")) {
-    fetchVocabularyFromAPI(level.replace("N", ""));
   }
 }
