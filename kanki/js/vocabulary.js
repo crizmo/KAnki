@@ -2,7 +2,7 @@
  * JLPT Vocabulary Data
  * Organized by JLPT level
  */
-var JLPT_VOCABULARY = {
+var VOCABULARY = {
   "N5": [
     {"front": "こんにちは", "back": "Hello", "notes": "Greeting"},
     {"front": "ありがとう", "back": "Thank you", "notes": "Gratitude"},

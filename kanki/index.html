@@ -1,12 +1,9 @@
 <!DOCTYPE HTML>
-
-<!-- Copyright Bluebotlaboratories -->
-
 <html>
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
   <meta charset="utf-8">
-  <link rel="preload" href="assets/fonts/japanese.ttf" as="font" type="font/ttf" crossorigin="anonymous">
+  <link rel="preload" href="assets/fonts/language.ttf" as="font" type="font/ttf" crossorigin="anonymous">
   <script src="js/polyfill.min.js"></script>
   <script src="js/sdk.js"></script>
   <!-- Add the vocabulary file before main.js -->
@@ -26,10 +23,9 @@
     <div id="levelDisplay" class="levelDisplay"></div>
   </div>
   
-  <div id="jlptLevelButtons" class="buttonContainer">
-    <button onclick="changeJlptLevel('all')">All Levels</button>
-    <button onclick="changeJlptLevel('N5')">N5</button>
-    <button onclick="changeJlptLevel('N4')">N4</button>
+  <div id="levelButtons" class="buttonContainer">
+    <button onclick="changeLevel('all')">All Levels</button>
+    <!-- Other level buttons will be added dynamically by JavaScript -->
   </div>
   
   <div id="mainContainer">
@@ -50,12 +46,11 @@
     <div class="buttonContainer">
       <button onclick="resetProgress()">Reset Progress</button>
       <button onclick="resetAll()">Reset All Data</button>
-      <p>&#12371;&#12435;&#12395;&#12385;&#12399;&#65281;</p>
     </div>
   </div>
   
   <div class="footer">
-    <p>v0.3.0</p>
+    <p>v0.3.1</p>
   </div>
 </body>
 </html>
