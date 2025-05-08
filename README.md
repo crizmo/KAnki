@@ -45,7 +45,7 @@ KAnki makes it easy to study any language by changing just a few files:
 
 ### 1. Prepare the font for your target language
 
-Download or convert a TTF/OTF font file that supports your target language. Rename it to `language.ttf` and place it in:
+Download or convert a TTF font file that supports your target language. Rename it to `language.ttf` and place it in:
 ```
 kanki/assets/fonts/language.ttf
 ```
