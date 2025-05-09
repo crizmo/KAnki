@@ -5,22 +5,8 @@ var incorrectAnswers = 0;
 var deck = null;
 var currentLevel = "all"; // Default to show all cards
 var fontLoaded = false;
-var appLanguage = "Japanese"; // Change this to your language name, for example "Spanish" / "Arabic" / "French"
-var appLevels = ["N5", "N4"]; // Configurable levels - change according to vocabulary.js ,e.g. ["A1", "A2", "B1", "B2", "C1", "C2"]
-
-// Convert non-ASCII characters to HTML entities for Kindle display
-// function toEscapeCodes(str) {
-//   var result = "";
-//   for (var i = 0; i < str.length; i++) {
-//     var charCode = str.charCodeAt(i);
-//     if (charCode > 127) {
-//       result += "&#" + charCode + ";";
-//     } else {
-//       result += str.charAt(i);
-//     }
-//   }
-//   return result;
-// }
+var appLanguage = "Japanese"; // Change this to your language name
+var appLevels = ["N5", "N4"]; // Configurable levels according to your js/vocabulary.js
 
 // The logging function
 function log(logStuff) {
@@ -34,17 +20,16 @@ function log(logStuff) {
 function loadLanguageFont() {
   log("Loading " + appLanguage + " font...");
   
-  // Force font loading
-  var fontCSS = "@font-face { font-family: 'LanguageFont'; src: url('assets/fonts/language.ttf') format('truetype'); font-weight: normal; font-style: normal; font-display: block; }";
-  var styleElement = document.createElement('style');
-  styleElement.textContent = fontCSS;
-  document.head.appendChild(styleElement);
+  // Force font loading early
+  document.documentElement.style.fontFamily = "LanguageFont, sans-serif";
   
-  // Wait longer for Kindle's slower processing
+  // Wait for Kindle's slower processing
   setTimeout(function() {
     fontLoaded = true;
     log(appLanguage + " font loading completed");
-  }, 2000);
+    // Initial card display after font is loaded
+    displayCurrentCard(false);
+  }, 1000);
 }
 
 // Create flashcard deck data structure
@@ -78,7 +63,6 @@ function createDefaultDeck() {
   var deck = createDeck();
   
   // Add words from the VOCABULARY object
-  // First, check if VOCABULARY is defined
   if (typeof VOCABULARY !== 'undefined') {
     // Iterate through all levels in the vocabulary
     for (var level in VOCABULARY) {
@@ -99,9 +83,8 @@ function createDefaultDeck() {
     
     log("Created default deck with " + deck.cards.length + " cards");
   } else {
-    // Fallback if vocabulary file isn't loaded - basic set of cards
+    // Fallback if vocabulary file isn't loaded
     log("Warning: VOCABULARY not found, using minimal deck");
-    
     deck.cards.push(createCard("Example", null, "Translation", "Sample card", appLevels[0], 0));
     deck.cards.push(createCard("Second", null, "Another translation", "Another sample", appLevels[0], 0));
   }
@@ -109,55 +92,45 @@ function createDefaultDeck() {
   return deck;
 }
 
-// Update status message with optional confirmation buttons
-function updateStatusMessage(message, isConfirmation, onConfirm, onCancel) {
+// Update status message for notifications (not confirmations)
+function updateStatusMessage(message) {
   var statusElement = document.getElementById("statusMessage");
   if (!statusElement) return;
   
-  // Clear existing content
-  statusElement.innerHTML = '';
-  
-  // Add message
-  var messageEl = document.createElement("div");
-  messageEl.className = "statusText";
-  messageEl.textContent = message;
-  statusElement.appendChild(messageEl);
-  
-  // If this is a confirmation, add yes/no buttons
-  if (isConfirmation && onConfirm) {
-    var buttonContainer = document.createElement("div");
-    buttonContainer.className = "statusButtons";
-    
-    var yesButton = document.createElement("button");
-    yesButton.textContent = "Yes";
-    yesButton.className = "confirmBtn";
-    yesButton.onclick = function() {
-      statusElement.style.display = "none";
-      onConfirm();
-    };
-    
-    var noButton = document.createElement("button");
-    noButton.textContent = "No";
-    noButton.className = "cancelBtn";
-    noButton.onclick = function() {
-      statusElement.style.display = "none";
-      if (onCancel) onCancel();
-    };
-    
-    buttonContainer.appendChild(yesButton);
-    buttonContainer.appendChild(noButton);
-    statusElement.appendChild(buttonContainer);
-  }
+  // Set message text
+  statusElement.textContent = message;
   
   // Display the message
   statusElement.style.display = "block";
   
-  // Auto-hide for non-confirmation messages
-  if (!isConfirmation) {
-    setTimeout(function() {
-      statusElement.style.display = "none";
-    }, 3000);
-  }
+  // Auto-hide after delay
+  setTimeout(function() {
+    statusElement.style.display = "none";
+  }, 3000);
+}
+
+// Show confirmation popup
+function showConfirmation(message, onConfirm) {
+  var overlay = document.getElementById("confirmationOverlay");
+  var messageElement = document.getElementById("confirmationMessage");
+  var yesButton = document.getElementById("confirmYesBtn");
+  var noButton = document.getElementById("confirmNoBtn");
+  
+  // Set message
+  messageElement.textContent = message;
+  
+  // Set button handlers
+  yesButton.onclick = function() {
+    overlay.style.display = "none";
+    if (onConfirm) onConfirm();
+  };
+  
+  noButton.onclick = function() {
+    overlay.style.display = "none";
+  };
+  
+  // Show overlay
+  overlay.style.display = "block";
 }
 
 // Spaced repetition algorithm (simplified SM-2)
@@ -225,63 +198,61 @@ function getDueCards() {
   return dueCards;
 }
 
-// Display current card
+// Display current card - optimized to update DOM elements instead of recreating them
 function displayCurrentCard(showAnswer) {
-  var cardContainer = document.getElementById("cardContainer");
   var dueCards = getDueCards();
   
-  // Clear previous content
-  cardContainer.innerHTML = "";
+  // Get DOM elements once 
+  var cardContainer = document.getElementById("cardContainer");
+  var levelBadge = document.getElementById("levelBadge");
+  var frontElement = document.getElementById("cardFront");
+  var backElement = document.getElementById("cardBack");
+  var notesElement = document.getElementById("cardNotes");
+  var showAnswerBtn = document.getElementById("showAnswerBtn");
+  var incorrectBtn = document.getElementById("incorrectBtn");
+  var correctBtn = document.getElementById("correctBtn");
+  
+  // Hide answer elements by default
+  backElement.style.display = "none";
+  notesElement.style.display = "none";
   
   if (dueCards.length === 0) {
-    // No cards due
-    var message = document.createElement("div");
-    message.className = "card";
-    message.innerHTML = "<p>No cards due for review!</p><p>Great job!</p>";
-    cardContainer.appendChild(message);
-    document.getElementById("answerButtons").style.display = "none";
-    document.getElementById("showAnswerBtn").style.display = "none";
+    // No cards due - display message and hide buttons
+    cardContainer.style.display = "block";
+    frontElement.innerHTML = "<p>No cards due for review!</p><p>Great job!</p>";
+    levelBadge.style.display = "none";
+    showAnswerBtn.style.display = "none";
+    incorrectBtn.style.display = "none";
+    correctBtn.style.display = "none";
+    updateProgressDisplay();
     return;
   }
   
+  // Show card container
+  cardContainer.style.display = "block";
+  
+  // Get current card
   var card = dueCards[currentCardIndex % dueCards.length];
-  var cardElement = document.createElement("div");
-  cardElement.className = "card";
   
-  var levelBadge = document.createElement("div");
-  levelBadge.className = "levelBadge";
+  // Update card content
+  levelBadge.style.display = "block";
   levelBadge.textContent = card.level;
-  
-  var frontElement = document.createElement("div");
-  frontElement.className = "cardFront";
-  
-  // Use innerHTML to render the HTML entities
   frontElement.innerHTML = card.front;
-  frontElement.style.fontFamily = "LanguageFont, sans-serif";
+  backElement.textContent = card.back;
+  notesElement.textContent = card.notes || "";
   
-  cardElement.appendChild(levelBadge);
-  cardElement.appendChild(frontElement);
-  
+  // Control button visibility based on answer state
   if (showAnswer) {
-    var backElement = document.createElement("div");
-    backElement.className = "cardBack";
-    backElement.textContent = card.back;
-    
-    var notesElement = document.createElement("div");
-    notesElement.className = "cardNotes";
-    notesElement.textContent = card.notes;
-    
-    cardElement.appendChild(backElement);
-    cardElement.appendChild(notesElement);
-    
-    document.getElementById("showAnswerBtn").style.display = "none";
-    document.getElementById("answerButtons").style.display = "block";
+    backElement.style.display = "block";
+    notesElement.style.display = "block";
+    showAnswerBtn.style.display = "none";
+    incorrectBtn.style.display = "inline-block";
+    correctBtn.style.display = "inline-block";
   } else {
-    document.getElementById("showAnswerBtn").style.display = "block";
-    document.getElementById("answerButtons").style.display = "none";
+    showAnswerBtn.style.display = "inline-block";
+    incorrectBtn.style.display = "none";
+    correctBtn.style.display = "none";
   }
-  
-  cardContainer.appendChild(cardElement);
   
   // Update progress display
   updateProgressDisplay();
@@ -363,10 +334,12 @@ function onPageLoad() {
   deck = createDefaultDeck();
   log("Created new default deck");
   
-  // Display first card
-  displayCurrentCard(false);
+  // Initial progress display
+  updateProgressDisplay();
   
   log("Application initialized");
+  
+  // First card will be displayed after font loads
 }
 
 // Update level buttons dynamically based on appLevels
@@ -383,11 +356,7 @@ function updateLevelButtons() {
   for (var i = 0; i < appLevels.length; i++) {
     var button = document.createElement("button");
     button.textContent = appLevels[i];
-    button.onclick = function(level) {
-      return function() { 
-        changeLevel(level); 
-      };
-    }(appLevels[i]);
+    button.onclick = createLevelChangeHandler(appLevels[i]);
     levelsContainer.appendChild(button);
   }
 }
@@ -399,39 +368,58 @@ function createLevelChangeHandler(level) {
   };
 }
 
+// Show reset progress confirmation
+function showResetProgressConfirm() {
+  showConfirmation("Are you sure you want to reset all cards' progress?", resetProgress);
+}
+
+// Show reset all confirmation
+function showResetAllConfirm() {
+  showConfirmation("Are you sure you want to reset all data? This will delete all cards and progress.", resetAll);
+}
+
+// Show toast notification
+function showToast(message, duration) {
+  var toast = document.getElementById("toastNotification");
+  if (!toast) return;
+  
+  // Set toast message
+  toast.textContent = message;
+  
+  // Show toast
+  toast.style.display = "block";
+  
+  // Auto-hide after specified duration
+  setTimeout(function() {
+    toast.style.display = "none";
+  }, duration || 2000); // Default 2 seconds
+}
+
 // Reset progress
 function resetProgress() {
-  updateStatusMessage("Are you sure you want to reset all cards' progress?", true, 
-    function() { // onConfirm
-      for (var i = 0; i < deck.cards.length; i++) {
-        deck.cards[i].difficulty = 0;
-        deck.cards[i].nextReview = new Date().getTime();
-        deck.cards[i].history = [];
-      }
-      
-      currentCardIndex = 0;
-      correctAnswers = 0;
-      incorrectAnswers = 0;
-      
-      displayCurrentCard(false);
-      updateStatusMessage("Progress has been reset", false);
-      log("Progress reset");
-    }
-  );
+  for (var i = 0; i < deck.cards.length; i++) {
+    deck.cards[i].difficulty = 0;
+    deck.cards[i].nextReview = new Date().getTime();
+    deck.cards[i].history = [];
+  }
+  
+  currentCardIndex = 0;
+  correctAnswers = 0;
+  incorrectAnswers = 0;
+  
+  displayCurrentCard(false);
+  showToast("Progress has been reset", 2000);
+  log("Progress reset");
 }
 
 // Reset all
 function resetAll() {
-  updateStatusMessage("Are you sure you want to reset all data? This will delete all cards and progress.", true,
-    function() { // onConfirm
-      deck = createDefaultDeck();
-      currentCardIndex = 0;
-      correctAnswers = 0;
-      incorrectAnswers = 0;
-      
-      displayCurrentCard(false);
-      updateStatusMessage("All data has been reset", false);
-      log("Complete reset performed");
-    }
-  );
+  deck = createDefaultDeck();
+  currentCardIndex = 0;
+  correctAnswers = 0;
+  incorrectAnswers = 0;
+  
+  displayCurrentCard(false);
+  showToast("All data has been reset", 2000);
+  log("Complete reset performed");
 }

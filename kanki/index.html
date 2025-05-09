@@ -6,12 +6,9 @@
   <link rel="preload" href="assets/fonts/language.ttf" as="font" type="font/ttf" crossorigin="anonymous">
   <script src="js/polyfill.min.js"></script>
   <script src="js/sdk.js"></script>
-  <!-- Add the vocabulary file before main.js -->
   <script src="js/vocabulary.js"></script>
   <script src="main.js"></script>
-
   <link href="main.css" rel="stylesheet">
-
   <title>KAnki</title>
 </head>
 <body onload="onPageLoad()">
@@ -30,28 +27,44 @@
   
   <div id="mainContainer">
     <div id="statusMessage" style="display: none;"></div>
-    <div id="cardContainer">
-      <!-- Cards will be displayed here -->
+    
+    <!-- Fixed card structure to prevent DOM rebuilding -->
+    <div id="cardContainer" class="card">
+      <div id="levelBadge" class="levelBadge"></div>
+      <div id="cardFront" class="cardFront"></div>
+      <div id="cardBack" class="cardBack"></div>
+      <div id="cardNotes" class="cardNotes"></div>
     </div>
     
-    <div id="showAnswerBtn" class="buttonContainer">
-      <button onclick="showAnswer()">Show Answer</button>
-    </div>
-    
-    <div id="answerButtons" class="buttonContainer" style="display: none;">
-      <button onclick="answerCard(false)" class="incorrectBtn">Incorrect</button>
-      <button onclick="answerCard(true)" class="correctBtn">Correct</button>
+    <div id="controlButtons" class="buttonContainer">
+      <button id="showAnswerBtn" onclick="showAnswer()">Show Answer</button>
+      <button id="incorrectBtn" class="incorrectBtn" onclick="answerCard(false)" style="display: none;">Incorrect</button>
+      <button id="correctBtn" class="correctBtn" onclick="answerCard(true)" style="display: none;">Correct</button>
     </div>
     
     <div class="buttonContainer">
-      <button onclick="resetProgress()">Reset Progress</button>
-      <button onclick="resetAll()">Reset All Data</button>
+      <button onclick="showResetProgressConfirm()">Reset Progress</button>
+      <button onclick="showResetAllConfirm()">Reset All Data</button>
       <button onclick="window.location.reload();">Update</button>
     </div>
   </div>
   
+  <!-- Confirmation popup overlay (hidden by default) -->
+  <div id="confirmationOverlay" class="overlay" style="display: none;">
+    <div class="popup">
+      <div id="confirmationMessage" class="popup-message"></div>
+      <div class="popup-buttons">
+        <button id="confirmYesBtn" class="confirmBtn">Yes</button>
+        <button id="confirmNoBtn" class="cancelBtn">No</button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Toast notification (hidden by default) -->
+  <div id="toastNotification" class="toast-notification" style="display: none;"></div>
+  
   <div class="footer">
-    <p>v0.3.1</p>
+    <p>v0.3.4</p>
   </div>
 </body>
 </html>

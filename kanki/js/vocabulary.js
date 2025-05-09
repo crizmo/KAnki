@@ -105,5 +105,6 @@ var VOCABULARY = {
     {"front": "長い", "reading": "ながい", "back": "Long", "notes": "Adjective"},
     {"front": "短い", "reading": "みじかい", "back": "Short", "notes": "Adjective"},
     {"front": "明るい", "reading": "あかるい", "back": "Bright/Cheerful", "notes": "Adjective"},
-    {"front": "暗い", "reading": "くらい", "back": "Dark/Gloomy", "notes": "Adjective"}]
+    {"front": "暗い", "reading": "くらい", "back": "Dark/Gloomy", "notes": "Adjective"}
+  ]
 };
