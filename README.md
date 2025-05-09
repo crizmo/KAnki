@@ -39,6 +39,12 @@ KAnki is a spaced repetition flashcard application designed specifically for jai
 5. And done! Disconnect your Kindle from the computer
 6. Open the Kindle's home screen and run the KAnki app
 
+### Updating The Application
+1. If you already have kanki installed then follow the same process like you did earlier 
+2. Hencefoth , when updates are released , just remove the old `kanki` folder and `kanki.sh` and paste the new ones. 
+3. Then simply open the app and hit `Update` button
+4. And done , no more restarting needed !
+
 ## Customizing for Your Language
 
 KAnki makes it easy to study any language by changing just a few files:
