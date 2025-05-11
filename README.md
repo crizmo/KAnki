@@ -47,7 +47,7 @@ KAnki is a spaced repetition flashcard application designed specifically for jai
 
 ### 🔧 How to Update ( New Users ignore this )
 
-1. Back up your current `kanki/js/vocabulary.js` file if you have been using KAnki, ignore if you are a new user
+1. Back up your current `kanki/js/vocabulary.js` or `kanki/js/kanki_config.js` file if you have been using KAnki, ignore if you are a new user
 2. Download the new KAnki release
 3. Replace your old KAnki folder with the new one
 4. Copy your vocabulary data to the new `kanki/js/kanki_config.js` file
