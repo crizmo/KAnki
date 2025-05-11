@@ -6,7 +6,7 @@
   <link rel="preload" href="assets/fonts/language.ttf" as="font" type="font/ttf" crossorigin="anonymous">
   <script src="js/polyfill.min.js"></script>
   <script src="js/sdk.js"></script>
-  <script src="js/vocabulary.js"></script>
+  <script src="js/kanki_config.js"></script>
   <script src="main.js"></script>
   <link href="main.css" rel="stylesheet">
   <title>KAnki</title>
@@ -38,8 +38,8 @@
     
     <div id="controlButtons" class="buttonContainer">
       <button id="showAnswerBtn" onclick="showAnswer()">Show Answer</button>
-      <button id="incorrectBtn" class="incorrectBtn" onclick="answerCard(false)" style="display: none;">Incorrect</button>
-      <button id="correctBtn" class="correctBtn" onclick="answerCard(true)" style="display: none;">Correct</button>
+      <button id="incorrectBtn" class="incorrectBtn" onclick="handleAnswerCard(false)" style="display: none;">Incorrect</button>
+      <button id="correctBtn" class="correctBtn" onclick="handleAnswerCard(true)" style="display: none;">Correct</button>
     </div>
     
     <div class="buttonContainer">
@@ -64,7 +64,7 @@
   <div id="toastNotification" class="toast-notification" style="display: none;"></div>
   
   <div class="footer">
-    <p>v0.3.2</p>
+    <p>v0.3.3</p>
   </div>
 </body>
 </html>

@@ -5,8 +5,19 @@ var incorrectAnswers = 0;
 var deck = null;
 var currentLevel = "all"; // Default to show all cards
 var fontLoaded = false;
-var appLanguage = "Japanese"; // Change this to your language name
-var appLevels = ["N5", "N4"]; // Configurable levels according to your js/vocabulary.js
+var incorrectCardsQueue = []; // Queue for storing incorrect cards
+var inErrorReviewMode = false; // Flag to track if we're in error review mode
+
+// Initialize configuration from vocabulary.js if available
+function initializeConfig() {
+  if (typeof KANKI_CONFIG !== 'undefined') {
+    appLanguage = KANKI_CONFIG.language || appLanguage;
+    appLevels = KANKI_CONFIG.levels || appLevels;
+    log("Loaded custom configuration: " + appLanguage + " with levels: " + appLevels.join(", "));
+  } else {
+    log("Using default configuration");
+  }
+}
 
 // The logging function
 function log(logStuff) {
@@ -224,6 +235,12 @@ function displayCurrentCard(showAnswer) {
     showAnswerBtn.style.display = "none";
     incorrectBtn.style.display = "none";
     correctBtn.style.display = "none";
+    
+    // Check if we have incorrect cards to review
+    if (incorrectCardsQueue.length > 0) {
+      showErrorReviewPrompt();
+    }
+    
     updateProgressDisplay();
     return;
   }
@@ -261,6 +278,14 @@ function displayCurrentCard(showAnswer) {
 // Update the progress display
 function updateProgressDisplay() {
   var progressElement = document.getElementById("progressDisplay");
+  
+  if (inErrorReviewMode) {
+    progressElement.textContent = "Error Review: Card " + (currentCardIndex + 1) + 
+      " of " + incorrectCardsQueue.length + " • Correct: " + correctAnswers + 
+      " • Incorrect: " + incorrectAnswers;
+    return;
+  }
+  
   var dueCards = getDueCards();
   
   if (dueCards.length === 0) {
@@ -284,7 +309,11 @@ function updateLevelDisplay() {
 
 // Handle showing the answer
 function showAnswer() {
-  displayCurrentCard(true);
+  if (inErrorReviewMode) {
+    displayErrorCard(true);
+  } else {
+    displayCurrentCard(true);
+  }
 }
 
 // Handle marking card as correct or incorrect
@@ -303,13 +332,22 @@ function answerCard(wasCorrect) {
     correctAnswers++;
   } else {
     incorrectAnswers++;
+    // Add to error review queue when not already in error review mode
+    if (!inErrorReviewMode) {
+      incorrectCardsQueue.push(card);
+    }
   }
   
   // Move to next card
   currentCardIndex++;
   
-  // Display next card
-  displayCurrentCard(false);
+  // Check if we're done with regular cards and have errors to review
+  if (!inErrorReviewMode && currentCardIndex % dueCards.length === 0 && incorrectCardsQueue.length > 0) {
+    showErrorReviewPrompt();
+  } else {
+    // Display next card
+    displayCurrentCard(false);
+  }
 }
 
 // Change the currently selected level
@@ -323,6 +361,9 @@ function changeLevel(level) {
 // Initialize app on page load
 function onPageLoad() {
   log("Application initializing...");
+
+  // Load configuration
+  initializeConfig();
   
   // Load language font
   loadLanguageFont();
@@ -406,6 +447,8 @@ function resetProgress() {
   currentCardIndex = 0;
   correctAnswers = 0;
   incorrectAnswers = 0;
+  incorrectCardsQueue = []; // Clear error queue
+  inErrorReviewMode = false;
   
   displayCurrentCard(false);
   showToast("Progress has been reset", 2000);
@@ -418,8 +461,145 @@ function resetAll() {
   currentCardIndex = 0;
   correctAnswers = 0;
   incorrectAnswers = 0;
+  incorrectCardsQueue = []; // Clear error queue
+  inErrorReviewMode = false;
   
   displayCurrentCard(false);
   showToast("All data has been reset", 2000);
   log("Complete reset performed");
+}
+
+// Show prompt to review errors
+function showErrorReviewPrompt() {
+  showConfirmation(
+    "You have " + incorrectCardsQueue.length + " incorrect cards. Review them now?", 
+    startErrorReview
+  );
+}
+
+// Start error review mode
+function startErrorReview() {
+  if (incorrectCardsQueue.length === 0) return;
+  
+  inErrorReviewMode = true;
+  showToast("Reviewing incorrect cards", 2000);
+  
+  // Set up for error review
+  var statusElement = document.getElementById("statusMessage");
+  statusElement.textContent = "Error Review Mode";
+  statusElement.style.display = "block";
+  
+  // Start from first error card
+  currentCardIndex = 0;
+  displayErrorCard(false);
+}
+
+// Display error card
+function displayErrorCard(showAnswer) {
+  // Similar to displayCurrentCard but works with incorrectCardsQueue
+  var cardContainer = document.getElementById("cardContainer");
+  var levelBadge = document.getElementById("levelBadge");
+  var frontElement = document.getElementById("cardFront");
+  var backElement = document.getElementById("cardBack");
+  var notesElement = document.getElementById("cardNotes");
+  var showAnswerBtn = document.getElementById("showAnswerBtn");
+  var incorrectBtn = document.getElementById("incorrectBtn");
+  var correctBtn = document.getElementById("correctBtn");
+  
+  // Hide answer elements by default
+  backElement.style.display = "none";
+  notesElement.style.display = "none";
+  
+  if (currentCardIndex >= incorrectCardsQueue.length) {
+    // Finished with all error cards
+    endErrorReview();
+    return;
+  }
+  
+  // Show card container
+  cardContainer.style.display = "block";
+  
+  // Get current error card
+  var card = incorrectCardsQueue[currentCardIndex];
+  
+  // Update card content
+  levelBadge.style.display = "block";
+  levelBadge.textContent = card.level;
+  frontElement.innerHTML = card.front;
+  backElement.textContent = card.back;
+  notesElement.textContent = card.notes || "";
+  
+  // Control button visibility based on answer state
+  if (showAnswer) {
+    backElement.style.display = "block";
+    notesElement.style.display = "block";
+    showAnswerBtn.style.display = "none";
+    incorrectBtn.style.display = "inline-block";
+    correctBtn.style.display = "inline-block";
+  } else {
+    showAnswerBtn.style.display = "inline-block";
+    incorrectBtn.style.display = "none";
+    correctBtn.style.display = "none";
+  }
+  
+  // Update progress display
+  updateProgressDisplay();
+}
+
+// Answer error card
+function answerErrorCard(wasCorrect) {
+  if (currentCardIndex >= incorrectCardsQueue.length) return;
+  
+  var card = incorrectCardsQueue[currentCardIndex];
+  
+  // Only mark the card for removal if correct
+  if (wasCorrect) {
+    // Remove from error queue on next cycle
+    incorrectCardsQueue[currentCardIndex] = null;
+  }
+  
+  // Move to next card
+  currentCardIndex++;
+  
+  if (currentCardIndex >= incorrectCardsQueue.length) {
+    endErrorReview();
+  } else {
+    displayErrorCard(false);
+  }
+}
+
+// End error review mode
+function endErrorReview() {
+  // Clean up the queue (remove null entries from cards that were answered correctly)
+  incorrectCardsQueue = incorrectCardsQueue.filter(function(card) {
+    return card !== null;
+  });
+  
+  inErrorReviewMode = false;
+  
+  // Reset UI
+  var statusElement = document.getElementById("statusMessage");
+  statusElement.style.display = "none";
+  
+  // If we still have errors, ask if user wants to try again
+  if (incorrectCardsQueue.length > 0) {
+    showConfirmation(
+      "You still have " + incorrectCardsQueue.length + " cards to master. Review them again?",
+      startErrorReview
+    );
+  } else {
+    showToast("All error cards reviewed successfully!", 2000);
+    // Return to normal mode
+    currentCardIndex = 0;
+    displayCurrentCard(false);
+  }
+}
+
+// Handle answer card (redirects to appropriate function based on mode)
+function handleAnswerCard(wasCorrect) {
+  if (inErrorReviewMode) {
+    answerErrorCard(wasCorrect);
+  } else {
+    answerCard(wasCorrect);
+  }
 }

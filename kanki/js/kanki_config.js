@@ -1,4 +1,13 @@
 /**
+ * KAnki Configuration
+ * Edit these settings to customize the app for your language
+ */
+var KANKI_CONFIG = {
+  language: "Japanese",  // Change this to your language name
+  levels: ["N5", "N4"]   // These should match the keys in your VOCABULARY object
+};
+
+/**
  * JLPT Vocabulary Data
  * Organized by JLPT level
  */

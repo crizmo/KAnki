@@ -15,6 +15,8 @@ KAnki is a spaced repetition flashcard application designed specifically for jai
 - Customizable vocabulary flashcards with any proficiency levels
 - Filtering by level (JLPT, CEFR, HSK, or any custom system)
 - Progress tracking
+- **Error review mode**: Review cards you answered incorrectly right after completing a session
+- **Centralized configuration**: Easy customization through a single configuration file
 
 ## Technical Limitations
 
@@ -30,20 +32,31 @@ KAnki is a spaced repetition flashcard application designed specifically for jai
 - Access to the Kindle's filesystem
 - Basic knowledge of file transfer to Kindle
 
-### Running the Application
-
+### How to Install KAnki ( New Users )
 1. Clone this repository or download it as a ZIP file
 2. Connect your Kindle to a computer via USB
 3. Unzip the downloaded file (Make sure the name is KAnki) 
 4. Copy the KAnki folder and the `kanki.sh` script to the `documents` folder on your Kindle
-5. And done! Disconnect your Kindle from the computer
-6. Open the Kindle's home screen and run the KAnki app
+5. Open the `kanki/js/kanki_config.js` file and edit the configuration to match your language.
+6. Download or convert a TTF font file that supports your target language. Rename it to `language.ttf` and place it in:
+   ```
+   kanki/assets/fonts/language.ttf
+   ```
+7. Disconnect your Kindle from the computer
+8. Open the Kindle's home screen and run the KAnki app
 
-### Updating The Application
-1. If you already have kanki installed then follow the same process like you did earlier 
-2. Hencefoth , when updates are released , just remove the old `kanki` folder and `kanki.sh` and paste the new ones. 
-3. Then simply open the app and hit `Update` button
-4. And done , no more restarting needed !
+### 🔧 How to Update ( New Users ignore this )
+
+1. Back up your current `kanki/js/vocabulary.js` file if you have been using KAnki, ignore if you are a new user
+2. Download the new KAnki release
+3. Replace your old KAnki folder with the new one
+4. Copy your vocabulary data to the new `kanki/js/kanki_config.js` file
+5. Optional: Customize language settings in `kanki_config.js`
+6. Copy your `language.ttf` font file to the new `kanki/assets/fonts/language.ttf` location
+7. Disconnect your Kindle from the computer
+8. Open the Kindle's home screen and run the KAnki app
+9. Hit the `Update` button in the app to apply changes
+10. Done! Your KAnki app is now updated with the latest features
 
 ## Customizing for Your Language
 
@@ -56,26 +69,34 @@ Download or convert a TTF font file that supports your target language. Rename i
 kanki/assets/fonts/language.ttf
 ```
 
-### 2. Update the vocabulary file
+### 2. Update the configuration file
 
-Edit `kanki/js/vocabulary.js` to include vocabulary for your target language:
+Edit `kanki/js/kanki_config.js` to include your language configuration and vocabulary:
 
 ```javascript
 /**
- * Vocabulary Data for KAnki
+ * KAnki Configuration
+ * Edit these settings to customize the app for your language
+ */
+var KANKI_CONFIG = {
+  language: "Spanish",  // Change this to your language name
+  levels: ["A1", "A2", "B1"]   // These should match the keys in your VOCABULARY object
+};
+
+/**
+ * Vocabulary Data
  * Organized by proficiency level
  */
 var VOCABULARY = {
   "A1": [
     {"front": "hello", "back": "hola", "notes": "Greeting"},
-    {"front": "thank you", "back": "gracias", "notes": "Gratitude"},
     // Add more words...
   ],
   "A2": [
     {"front": "tomorrow", "back": "mañana", "notes": "Time"},
-    {"front": "yesterday", "back": "ayer", "notes": "Time"},
     // Add more words...
-  ]
+  ],
+  // Add more levels...
 };
 ```
 
@@ -84,20 +105,6 @@ For languages with different writing systems, use the `reading` property:
 ```javascript
 {"front": "こんにちは", "reading": "konnichiwa", "back": "Hello", "notes": "Greeting"}
 ```
-
-### 3. Configure language settings
-
-Open `kanki/main.js` and update these two variables:
-
-```javascript
-var appLanguage = "Spanish"; // Change to your language name
-var appLevels = ["A1", "A2", "B1"]; // Change to match your vocabulary levels
-```
-
-That's it! KAnki will automatically:
-- Load your language font
-- Generate level buttons based on your defined levels
-- Display cards with proper formatting for your language
 
 ## Development
 
@@ -114,9 +121,9 @@ kanki/
     fonts/
       language.ttf     # Language font file
   js/
+    kanki_config.js  # Language configuration and vocabulary
     polyfill.min.js  # ES5 polyfills
     sdk.js           # Kindle-specific functions
-    vocabulary.js    # Default vocabulary
 ```
 
 ### Technical Details
