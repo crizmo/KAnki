@@ -26,13 +26,13 @@ KAnki is a spaced repetition flashcard application designed specifically for jai
 
 ## Setup Instructions
 
-### Prerequisites
+## Prerequisites
 
 - A jailbroken Kindle device
 - Access to the Kindle's filesystem
 - Basic knowledge of file transfer to Kindle
 
-### How to Install KAnki ( New Users )
+## How to Install KAnki ( New Users )
 1. Clone this repository or download it as a ZIP file
 2. Connect your Kindle to a computer via USB
 3. Unzip the downloaded file (Make sure the name is KAnki) 
@@ -45,7 +45,7 @@ KAnki is a spaced repetition flashcard application designed specifically for jai
 7. Disconnect your Kindle from the computer
 8. Open the Kindle's home screen and run the KAnki app
 
-### 🔧 How to Update ( New Users ignore this )
+## 🔧 How to Update ( New Users ignore this )
 
 1. Back up your current `kanki/js/vocabulary.js` or `kanki/js/kanki_config.js` file if you have been using KAnki, ignore if you are a new user
 2. Download the new KAnki release
