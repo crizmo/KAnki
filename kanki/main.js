@@ -49,38 +49,120 @@ function loadLanguageFont() {
 function initializeFixedHeights() {
   log("Initializing fixed element heights for e-ink optimization...");
   
+  var viewport = detectViewportAndAdjust();
   var cardContainer = document.getElementById("cardContainer");
   var controlButtons = document.getElementById("controlButtons");
   var intervalButtons = document.getElementById("intervalButtons");
   
+  // Set dimensions based on screen size
+  var cardHeight = "300px";
+  var controlHeight = "160px"; 
+  var intervalTop = "70px";
+  var backMinHeight = "50px";
+  var notesMinHeight = "20px";
+  
+  // Adjust dimensions based on detected viewport
+  if (viewport.width >= 1800 || viewport.height >= 2400) {
+    // Kindle Scribe
+    cardHeight = "700px";
+    controlHeight = "320px";
+    intervalTop = "130px";
+    backMinHeight = "120px";
+    notesMinHeight = "40px";
+  } else if (viewport.width >= 1050 || viewport.height >= 1400) {
+    // Large Kindles
+    cardHeight = "550px";
+    controlHeight = "240px";
+    intervalTop = "100px";
+    backMinHeight = "90px";
+    notesMinHeight = "30px";
+  } else if (viewport.width >= 750 || viewport.height >= 1000) {
+    // Medium Kindles
+    cardHeight = "400px";
+    controlHeight = "200px";
+    intervalTop = "85px";
+    backMinHeight = "65px";
+    notesMinHeight = "25px";
+  }
+  
   if (cardContainer) {
-    cardContainer.style.height = "300px"; 
+    cardContainer.style.height = cardHeight; 
     cardContainer.style.overflow = "hidden";
   }
   
   if (controlButtons) {
-    controlButtons.style.height = "160px"; 
+    controlButtons.style.height = controlHeight; 
     controlButtons.style.overflow = "hidden";
   }
   
   if (intervalButtons) {
     intervalButtons.style.display = "block";
     intervalButtons.style.visibility = "hidden";
-    intervalButtons.style.top = "70px";
+    intervalButtons.style.top = intervalTop;
     var forceLayout = intervalButtons.offsetHeight;
   }
   
   var backElement = document.getElementById("cardBack");
   if (backElement) {
-    backElement.style.minHeight = "50px";
+    backElement.style.minHeight = backMinHeight;
   }
   
   var notesElement = document.getElementById("cardNotes");
   if (notesElement) {
-    notesElement.style.minHeight = "20px";
+    notesElement.style.minHeight = notesMinHeight;
   }
   
-  log("Fixed element heights initialized");
+  log("Fixed element heights initialized for viewport " + viewport.width + "x" + viewport.height);
+}
+
+// Detect viewport size and adjust UI accordingly
+function detectViewportAndAdjust() {
+  var width = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+  var height = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+  
+  log("Detected viewport size: " + width + "x" + height);
+  
+  // Add a CSS class to the body based on screen size range
+  var body = document.body;
+  
+  // Remove existing size classes
+  body.classList.remove('kindle-small', 'kindle-medium', 'kindle-large', 'kindle-xlarge');
+  
+  // Add appropriate class
+  if (width <= 600) {
+    body.classList.add('kindle-small');
+  } else if (width <= 850) {
+    body.classList.add('kindle-medium');
+  } else if (width <= 1300) {
+    body.classList.add('kindle-large');
+  } else {
+    body.classList.add('kindle-xlarge');
+  }
+  
+  return { width: width, height: height };
+}
+
+// Handle window resize or orientation change events
+function handleViewportChange() {
+  // Debounce the resize event
+  if (window.resizeTimer) {
+    clearTimeout(window.resizeTimer);
+  }
+  
+  window.resizeTimer = setTimeout(function() {
+    log("Viewport changed, reinitializing fixed heights...");
+    initializeFixedHeights();
+    displayCurrentCard(false);
+  }, 250);
+}
+
+// Add event listeners for window resize and orientation change
+function addViewportListeners() {
+  if (window.addEventListener) {
+    window.addEventListener('resize', handleViewportChange, false);
+    window.addEventListener('orientationchange', handleViewportChange, false);
+    log("Added viewport change listeners");
+  }
 }
 
 // Create flashcard deck data structure
@@ -338,7 +420,6 @@ function displayCurrentCard(showAnswer) {
   var backElement = document.getElementById("cardBack");
   var notesElement = document.getElementById("cardNotes");
   var showAnswerBtn = document.getElementById("showAnswerBtn");
-  var incorrectBtn = document.getElementById("incorrectBtn");
   var intervalButtons = document.getElementById("intervalButtons");
   var starButton = document.getElementById("starButton");
   
@@ -351,7 +432,6 @@ function displayCurrentCard(showAnswer) {
     frontElement.innerHTML = "<p>No cards due for review!</p><p>Great job!</p>";
     levelBadge.style.display = "none";
     showAnswerBtn.style.display = "none";
-    incorrectBtn.style.display = "none";
 
     intervalButtons.style.display = "block";
     intervalButtons.style.visibility = "hidden";
@@ -370,11 +450,9 @@ function displayCurrentCard(showAnswer) {
 
   var card = dueCards[currentCardIndex % dueCards.length];
   
-
   levelBadge.style.display = "block";
   levelBadge.textContent = card.level;
   
-
   if (isReversedMode) {
     frontElement.innerHTML = card.back;
     backElement.textContent = card.front;
@@ -401,12 +479,10 @@ function displayCurrentCard(showAnswer) {
     backElement.style.display = "block";
     notesElement.style.display = "block";
     showAnswerBtn.style.display = "none";
-    incorrectBtn.style.display = "inline-block";
     intervalButtons.style.display = "block";
     intervalButtons.style.visibility = "visible";
   } else {
     showAnswerBtn.style.display = "inline-block";
-    incorrectBtn.style.display = "none";
     intervalButtons.style.display = "block";
     intervalButtons.style.visibility = "hidden";
   }
@@ -512,9 +588,19 @@ function handleAnswerWithInterval(difficulty) {
     var cardIndex = currentCardIndex % dueCards.length;
     var card = dueCards[cardIndex];
 
+    // For 'again' difficulty, it's effectively the same as marking incorrect
+    // This replaces the separate "Incorrect" button functionality
+    if (difficulty === 'again') {
+      // Special handling for "Again" button (previously the "Incorrect" button)
+      incorrectAnswers++;
+      if (!inErrorReviewMode) {
+        incorrectCardsQueue.push(card);
+      }
+    } else {
+      correctAnswers++;
+    }
+
     setNextReviewTime(card, difficulty);
-  
-    correctAnswers++;
     
     currentCardIndex++;
     
@@ -575,7 +661,15 @@ function onPageLoad() {
 
   initializeFixedHeights();
 
+  detectViewportAndAdjust();
+
   updateLevelButtons();
+
+  addViewportListeners();
+
+  setupKindleGestures();
+
+  setupTouchGestures();
 
   if (!loadDeck()) {
     deck = createDefaultDeck();
@@ -716,7 +810,6 @@ function displayErrorCard(showAnswer) {
   var backElement = document.getElementById("cardBack");
   var notesElement = document.getElementById("cardNotes");
   var showAnswerBtn = document.getElementById("showAnswerBtn");
-  var incorrectBtn = document.getElementById("incorrectBtn");
   var intervalButtons = document.getElementById("intervalButtons");
   var starButton = document.getElementById("starButton");
 
@@ -760,12 +853,10 @@ function displayErrorCard(showAnswer) {
     backElement.style.display = "block";
     notesElement.style.display = "block";
     showAnswerBtn.style.display = "none";
-    incorrectBtn.style.display = "inline-block";
     intervalButtons.style.display = "block";
     intervalButtons.style.visibility = "visible";
   } else {
     showAnswerBtn.style.display = "inline-block";
-    incorrectBtn.style.display = "none";
     intervalButtons.style.display = "block";
     intervalButtons.style.visibility = "hidden";
   }
@@ -946,4 +1037,18 @@ function updateCardStats(card) {
   
   statsElement.innerHTML = "Viewed " + totalViews + " time" + (totalViews !== 1 ? "s" : "") + 
     " • Last: " + lastViewedText;
+}
+
+// Swipe gesture handling has been removed to fix button functionality
+
+// Kindle gesture integration removed to fix button functionality
+function setupKindleGestures() {
+  // Gesture support disabled
+  log("Kindle gestures disabled for button compatibility");
+}
+
+// Touch gesture support removed to fix button functionality
+function setupTouchGestures() {
+  // Touch gestures disabled
+  log("Touch gestures disabled for button compatibility");
 }
