@@ -141,8 +141,7 @@ kanki/
 
 ## Known Issues
 
-- Font not loading properly in some cases
-- UI rendering issues due to Kindle's limited CSS support
+- UI rendering issues due to different Kindle screen sizes
 
 ## Acknowledgements
 
