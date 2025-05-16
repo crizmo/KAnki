@@ -667,10 +667,6 @@ function onPageLoad() {
 
   addViewportListeners();
 
-  setupKindleGestures();
-
-  setupTouchGestures();
-
   if (!loadDeck()) {
     deck = createDefaultDeck();
     log("Created new default deck");
@@ -1037,18 +1033,4 @@ function updateCardStats(card) {
   
   statsElement.innerHTML = "Viewed " + totalViews + " time" + (totalViews !== 1 ? "s" : "") + 
     " • Last: " + lastViewedText;
-}
-
-// Swipe gesture handling has been removed to fix button functionality
-
-// Kindle gesture integration removed to fix button functionality
-function setupKindleGestures() {
-  // Gesture support disabled
-  log("Kindle gestures disabled for button compatibility");
-}
-
-// Touch gesture support removed to fix button functionality
-function setupTouchGestures() {
-  // Touch gestures disabled
-  log("Touch gestures disabled for button compatibility");
 }
