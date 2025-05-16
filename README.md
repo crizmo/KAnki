@@ -14,9 +14,12 @@ KAnki is a spaced repetition flashcard application designed specifically for jai
 - Spaced repetition system to optimize learning
 - Customizable vocabulary flashcards with any proficiency levels
 - Filtering by level (JLPT, CEFR, HSK, or any custom system)
-- Progress tracking
+- **Star/favorite system**: Mark important cards and filter by starred items
+- **Reversible cards**: Switch between target language → native and native → target language modes
+- **Per-card statistics**: Track how many times each card has been viewed and review history
 - **Error review mode**: Review cards you answered incorrectly right after completing a session
 - **Centralized configuration**: Easy customization through a single configuration file
+- **E-ink optimized UI**: Fixed element heights and visibility management to minimize screen refreshes
 
 ## Technical Limitations
 
@@ -56,7 +59,9 @@ KAnki is a spaced repetition flashcard application designed specifically for jai
 7. Disconnect your Kindle from the computer
 8. Open the Kindle's home screen and run the KAnki app
 9. Hit the `Update` button in the app to apply changes
-10. Done! Your KAnki app is now updated with the latest features
+10. Done! Your KAnki app is now updated with the latest features including the new star/favorite functionality
+
+**Note for users updating to the starred cards version**: When updating from a previous version without the star functionality, all your existing cards will initially be unstarred. You'll need to manually star your important cards after updating.
 
 ## Customizing for Your Language
 
@@ -132,11 +137,11 @@ kanki/
 - XMLHttpRequest is used instead of fetch for API calls
 - Custom language fonts are supported for proper character rendering
 - Local storage is used to save flashcard progress
+- Card objects include a `starred` property that persists with the deck data
 
 ## Known Issues
 
-- Font not loading properly in some cases
-- UI rendering issues due to Kindle's limited CSS support
+- UI rendering issues due to different Kindle screen sizes
 
 ## Acknowledgements
 
