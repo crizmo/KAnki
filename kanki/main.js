@@ -3,12 +3,12 @@ var currentCardIndex = 0;
 var correctAnswers = 0;
 var incorrectAnswers = 0;
 var deck = null;
-var currentLevel = "all"; // Default to show all cards
+var currentLevel = "all"; 
 var fontLoaded = false;
-var incorrectCardsQueue = []; // Queue for storing incorrect cards
-var inErrorReviewMode = false; // Flag to track if we're in error review mode
-var showingStarredOnly = false; // Flag to track if we're showing only starred cards
-var isReversedMode = false; // Flag to track if cards are being shown in reversed mode
+var incorrectCardsQueue = []; 
+var inErrorReviewMode = false;
+var showingStarredOnly = false; 
+var isReversedMode = false; 
 
 // Initialize configuration from vocabulary.js if available
 function initializeConfig() {
@@ -936,13 +936,7 @@ function updateCardStats(card) {
     }
   }
   
-  // Calculate accuracy percentage
-  var totalAnswers = correctAnswers + incorrectAnswers;
-  var accuracyText = totalAnswers > 0 ? 
-    Math.round((correctAnswers / totalAnswers) * 100) + "% accuracy" : 
-    "no answers yet";
-  
   // Build stats text
   statsElement.innerHTML = "Viewed " + totalViews + " time" + (totalViews !== 1 ? "s" : "") + 
-    " • Last: " + lastViewedText + " • " + accuracyText;
+    " • Last: " + lastViewedText;
 }

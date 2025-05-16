@@ -11,8 +11,7 @@ body {
   padding: 0;
   font-family: sans-serif;
   background-color: #f5f5f5;
-  /* Uncomment to test grayscale mode: */
-  /* filter: grayscale(1); */
+  filter: grayscale(1);
 }
 
 h1 {
@@ -37,7 +36,6 @@ h1 {
   border: 1px solid #000;
 }
 
-/* Increase fixed height to prevent flickering when content changes */
 .card {
   background-color: white;
   border-radius: 5px;
@@ -46,7 +44,7 @@ h1 {
   margin: 20px auto;
   max-width: 80%;
   position: relative;
-  min-height: 250px; /* Increased from 200px to be more stable on Kindle */
+  min-height: 250px;
 }
 
 .levelBadge {
@@ -101,12 +99,12 @@ h1 {
 }
 
 .correctBtn {
-  background-color: #555555; /* Was: #4caf50 (green) */
+  background-color: #555555; 
   color: white;
 }
 
 .incorrectBtn {
-  background-color: #222222; /* Was: #f44336 (red) */
+  background-color: #222222; 
   color: white;
 }
 
@@ -120,15 +118,13 @@ h1 {
   text-align: center;
 }
 
-/* Button container with fixed height to prevent layout shifts */
 #controlButtons {
-  min-height: 120px; /* Fixed height to accommodate all button states */
+  min-height: 120px; 
   position: relative;
   margin: 20px 0;
   text-align: center;
 }
 
-/* Styling for interval buttons container */
 #intervalButtons {
   text-align: center;
   margin: 0 auto;
@@ -136,7 +132,6 @@ h1 {
   margin-top: 10px;
 }
 
-/* Styling for interval buttons */
 .intervalBtn {
   padding: 8px 12px;
   margin: 5px;
@@ -148,22 +143,22 @@ h1 {
 }
 
 .againBtn {
-  background-color: #222222; /* Was: #f44336 (red) */
+  background-color: #222222;
   color: white;
 }
 
 .hardBtn {
-  background-color: #444444; /* Was: #ff9800 (orange) */
+  background-color: #444444; 
   color: white;
 }
 
 .goodBtn {
-  background-color: #666666; /* Was: #4caf50 (green) */
+  background-color: #666666; 
   color: white;
 }
 
 .easyBtn {
-  background-color: #888888; /* Was: #2196f3 (blue) */
+  background-color: #888888;
   color: white;
 }
 
@@ -178,13 +173,12 @@ h1 {
   z-index: 100;
 }
 
-/* Popup styling - revised for better Kindle compatibility */
 .popup {
   position: fixed;
   top: 50%;
   left: 50%;
-  margin-left: -150px; /* Half of max-width */
-  margin-top: -75px; /* Approximate half of height */
+  margin-left: -150px;
+  margin-top: -75px;
   background-color: white;
   padding: 20px;
   border-radius: 5px;
@@ -200,7 +194,6 @@ h1 {
   font-size: 1.1em;
 }
 
-/* Replace flexbox with table-based layout for Kindle compatibility */
 .popup-buttons {
   display: table;
   margin: 0 auto;
@@ -215,14 +208,14 @@ h1 {
 }
 
 .confirmBtn {
-  background-color: #666666; /* Was: #4caf50 (green) */
+  background-color: #666666; 
   color: white;
   border: 1px solid #000;
   padding: 8px 15px;
 }
 
 .cancelBtn {
-  background-color: #222222; /* Was: #f44336 (red) */
+  background-color: #222222;
   color: white;
   border: 1px solid #000;
   padding: 8px 15px;
@@ -235,14 +228,13 @@ h1 {
   color: #666;
 }
 
-/* Toast notification styling - revised for better Kindle positioning */
 .toast-notification {
   position: fixed;
-  top: 80px; /* Positioned below the title */
+  top: 80px;
   left: 50%;
   width: 80%;
   max-width: 300px;
-  margin-left: -150px; /* Half of max-width */
+  margin-left: -150px;
   background-color: rgba(0, 0, 0, 0.7);
   color: white;
   padding: 10px 20px;
@@ -267,16 +259,14 @@ h1 {
 }
 
 .starButton.starred {
-  color: #555; /* Darker shade for filled star */
+  color: #555; 
 }
 
-/* Style for the starred filter button when active */
 #starredFilterBtn.active {
   background-color: #555;
   color: white;
 }
 
-/* Reverse toggle button styling */
 #reverseToggleBtn.active {
   background-color: #555;
   color: white;
