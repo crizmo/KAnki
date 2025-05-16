@@ -14,6 +14,7 @@ KAnki is a spaced repetition flashcard application designed specifically for jai
 - Spaced repetition system to optimize learning
 - Customizable vocabulary flashcards with any proficiency levels
 - Filtering by level (JLPT, CEFR, HSK, or any custom system)
+- **Star/favorite system**: Mark important cards and filter by starred items
 - Progress tracking
 - **Error review mode**: Review cards you answered incorrectly right after completing a session
 - **Centralized configuration**: Easy customization through a single configuration file
@@ -56,7 +57,9 @@ KAnki is a spaced repetition flashcard application designed specifically for jai
 7. Disconnect your Kindle from the computer
 8. Open the Kindle's home screen and run the KAnki app
 9. Hit the `Update` button in the app to apply changes
-10. Done! Your KAnki app is now updated with the latest features
+10. Done! Your KAnki app is now updated with the latest features including the new star/favorite functionality
+
+**Note for users updating to the starred cards version**: When updating from a previous version without the star functionality, all your existing cards will initially be unstarred. You'll need to manually star your important cards after updating.
 
 ## Customizing for Your Language
 
@@ -132,6 +135,7 @@ kanki/
 - XMLHttpRequest is used instead of fetch for API calls
 - Custom language fonts are supported for proper character rendering
 - Local storage is used to save flashcard progress
+- Card objects include a `starred` property that persists with the deck data
 
 ## Known Issues
 
@@ -142,3 +146,35 @@ kanki/
 
 - Inspired by the Anki spaced repetition software
 - Special thanks to the Kindle jailbreak community
+
+## Using the Star/Favorite Card Feature
+
+KAnki now includes the ability to star or favorite important cards and filter by your starred items:
+
+### How to Star Cards
+
+1. When viewing a flashcard, you'll notice a star button (☆) in the top-left corner of the card
+2. Tap the star button to mark a card as a favorite - the star will fill (★) to indicate it's starred
+3. Tap again to unstar the card
+4. A toast notification will confirm when you star or unstar a card
+
+### Filtering by Starred Cards
+
+1. In the level selection area, there's now a "★ Starred" button along with the regular level filters
+2. Tap this button to show only your starred cards
+3. The level display will show "(Starred Only)" when the filter is active
+4. You can combine this with level filters to show only starred cards within a specific level
+5. Tap the button again to turn off the starred filter and show all cards
+
+### Additional Notes
+
+- Star status persists even when resetting progress (but is cleared with "Reset All Data")
+- The star filter works alongside the existing level filter system
+- Starring cards is particularly useful for:
+  - Marking difficult words you want to focus on
+  - Creating a custom subset of vocabulary for intensive study
+  - Flagging cards you want to review more frequently
+
+## Todo
+Have a mode to reverse cards so if you input in the cards spanish -> english you can switch the mode and do it from english -> spanish. 
+Per-card stats showing how many times each card has been seen and when it was last reviewed

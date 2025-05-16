@@ -31,6 +31,8 @@
     <!-- Fixed card structure to prevent DOM rebuilding -->
     <div id="cardContainer" class="card">
       <div id="levelBadge" class="levelBadge"></div>
+      <!-- Add star button to the card -->
+      <button id="starButton" class="starButton" onclick="toggleStarCurrentCard()">☆</button>
       <div id="cardFront" class="cardFront"></div>
       <div id="cardBack" class="cardBack"></div>
       <div id="cardNotes" class="cardNotes"></div>
@@ -39,7 +41,12 @@
     <div id="controlButtons" class="buttonContainer">
       <button id="showAnswerBtn" onclick="showAnswer()">Show Answer</button>
       <button id="incorrectBtn" class="incorrectBtn" onclick="handleAnswerCard(false)" style="display: none;">Incorrect</button>
-      <button id="correctBtn" class="correctBtn" onclick="handleAnswerCard(true)" style="display: none;">Correct</button>
+      <div id="intervalButtons" style="display: none;">
+        <button class="intervalBtn againBtn" onclick="handleAnswerWithInterval('again')">Again<br>&lt;10m</button>
+        <button class="intervalBtn hardBtn" onclick="handleAnswerWithInterval('hard')">Hard<br>1d</button>
+        <button class="intervalBtn goodBtn" onclick="handleAnswerWithInterval('good')">Good<br>3d</button>
+        <button class="intervalBtn easyBtn" onclick="handleAnswerWithInterval('easy')">Easy<br>7d</button>
+      </div>
     </div>
     
     <div class="buttonContainer">

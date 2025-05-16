@@ -7,6 +7,7 @@ var currentLevel = "all"; // Default to show all cards
 var fontLoaded = false;
 var incorrectCardsQueue = []; // Queue for storing incorrect cards
 var inErrorReviewMode = false; // Flag to track if we're in error review mode
+var showingStarredOnly = false; // Flag to track if we're showing only starred cards
 
 // Initialize configuration from vocabulary.js if available
 function initializeConfig() {
@@ -65,7 +66,8 @@ function createCard(front, reading, back, notes, level, difficulty) {
     level: level || appLevels[0],
     difficulty: difficulty || 0,
     nextReview: new Date().getTime(),
-    history: []
+    history: [],
+    starred: false // Add starred property, default to false
   };
 }
 
@@ -191,6 +193,51 @@ function calculateNextReview(card, wasCorrect) {
   return card;
 }
 
+// Function to set next review time based on difficulty
+function setNextReviewTime(card, difficulty) {
+  var now = new Date().getTime();
+  
+  // Record the review in history
+  card.history.push({
+    date: now,
+    result: true,
+    difficulty: difficulty
+  });
+  
+  // Calculate interval based on difficulty
+  var interval;
+  switch (difficulty) {
+    case 'again':
+      interval = 10 * 60 * 1000; // 10 minutes
+      card.difficulty = Math.max(0, card.difficulty - 1); // Decrease difficulty
+      break;
+    case 'hard':
+      interval = 1 * 24 * 60 * 60 * 1000; // 1 day
+      // Keep difficulty the same
+      break;
+    case 'good':
+      interval = 3 * 24 * 60 * 60 * 1000; // 3 days
+      card.difficulty += 1; // Increase difficulty
+      break;
+    case 'easy':
+      interval = 7 * 24 * 60 * 60 * 1000; // 7 days
+      card.difficulty += 2; // Increase difficulty more
+      break;
+    default:
+      interval = 1 * 24 * 60 * 60 * 1000; // Default 1 day
+  }
+  
+  // Apply a multiplier based on current difficulty level (longer intervals for higher difficulty)
+  if (card.difficulty > 0) {
+    interval = interval * (1 + (card.difficulty * 0.5));
+  }
+  
+  // Set next review time
+  card.nextReview = now + interval;
+  
+  return card;
+}
+
 // Get cards due for review (filtered by level if applicable)
 function getDueCards() {
   var now = new Date().getTime();
@@ -199,8 +246,11 @@ function getDueCards() {
   for (var i = 0; i < deck.cards.length; i++) {
     var card = deck.cards[i];
     if (card.nextReview <= now) {
-      // Filter by level if a specific level is selected
-      if (currentLevel === "all" || card.level === currentLevel) {
+      // Apply both level and starred filters
+      var levelMatch = (currentLevel === "all" || card.level === currentLevel);
+      var starMatch = (!showingStarredOnly || card.starred === true);
+      
+      if (levelMatch && starMatch) {
         dueCards.push(card);
       }
     }
@@ -221,7 +271,8 @@ function displayCurrentCard(showAnswer) {
   var notesElement = document.getElementById("cardNotes");
   var showAnswerBtn = document.getElementById("showAnswerBtn");
   var incorrectBtn = document.getElementById("incorrectBtn");
-  var correctBtn = document.getElementById("correctBtn");
+  var intervalButtons = document.getElementById("intervalButtons");
+  var starButton = document.getElementById("starButton");
   
   // Hide answer elements by default
   backElement.style.display = "none";
@@ -234,7 +285,8 @@ function displayCurrentCard(showAnswer) {
     levelBadge.style.display = "none";
     showAnswerBtn.style.display = "none";
     incorrectBtn.style.display = "none";
-    correctBtn.style.display = "none";
+    intervalButtons.style.display = "none";
+    starButton.style.display = "none"; // Hide star button
     
     // Check if we have incorrect cards to review
     if (incorrectCardsQueue.length > 0) {
@@ -258,17 +310,21 @@ function displayCurrentCard(showAnswer) {
   backElement.textContent = card.back;
   notesElement.textContent = card.notes || "";
   
+  // Update star button
+  starButton.style.display = "block";
+  updateStarButton(card.starred);
+  
   // Control button visibility based on answer state
   if (showAnswer) {
     backElement.style.display = "block";
     notesElement.style.display = "block";
     showAnswerBtn.style.display = "none";
     incorrectBtn.style.display = "inline-block";
-    correctBtn.style.display = "inline-block";
+    intervalButtons.style.display = "block";
   } else {
     showAnswerBtn.style.display = "inline-block";
     incorrectBtn.style.display = "none";
-    correctBtn.style.display = "none";
+    intervalButtons.style.display = "none";
   }
   
   // Update progress display
@@ -304,7 +360,14 @@ function updateProgressDisplay() {
 // Update level display
 function updateLevelDisplay() {
   var levelDisplayElement = document.getElementById("levelDisplay");
-  levelDisplayElement.textContent = "Level: " + (currentLevel === "all" ? "All Levels" : currentLevel);
+  var displayText = "Level: " + (currentLevel === "all" ? "All Levels" : currentLevel);
+  
+  // Add starred status to display if filter is active
+  if (showingStarredOnly) {
+    displayText += " (Starred Only)";
+  }
+  
+  levelDisplayElement.textContent = displayText;
 }
 
 // Handle showing the answer
@@ -324,14 +387,21 @@ function answerCard(wasCorrect) {
   var cardIndex = currentCardIndex % dueCards.length;
   var card = dueCards[cardIndex];
   
-  // Update card with spacing algorithm
-  calculateNextReview(card, wasCorrect);
-  
-  // Update stats
-  if (wasCorrect) {
-    correctAnswers++;
-  } else {
+  if (!wasCorrect) {
+    // Record the incorrect answer
+    var now = new Date().getTime();
+    card.history.push({
+      date: now,
+      result: false
+    });
+    
+    // Reset difficulty and set for review soon
+    card.difficulty = 0;
+    card.nextReview = now + (10 * 60 * 1000); // 10 minutes
+    
+    // Update stats
     incorrectAnswers++;
+    
     // Add to error review queue when not already in error review mode
     if (!inErrorReviewMode) {
       incorrectCardsQueue.push(card);
@@ -347,6 +417,58 @@ function answerCard(wasCorrect) {
   } else {
     // Display next card
     displayCurrentCard(false);
+  }
+}
+
+// Handle answer with interval
+function handleAnswerWithInterval(difficulty) {
+  if (inErrorReviewMode) {
+    answerErrorCardWithInterval(difficulty);
+  } else {
+    var dueCards = getDueCards();
+    if (dueCards.length === 0) return;
+    
+    var cardIndex = currentCardIndex % dueCards.length;
+    var card = dueCards[cardIndex];
+    
+    // Calculate next review time based on selected difficulty
+    setNextReviewTime(card, difficulty);
+    
+    // Update stats
+    correctAnswers++;
+    
+    // Move to next card
+    currentCardIndex++;
+    
+    // Check if we're done with regular cards and have errors to review
+    if (currentCardIndex % dueCards.length === 0 && incorrectCardsQueue.length > 0) {
+      showErrorReviewPrompt();
+    } else {
+      // Display next card
+      displayCurrentCard(false);
+    }
+  }
+}
+
+// Handle error card review with intervals
+function answerErrorCardWithInterval(difficulty) {
+  if (currentCardIndex >= incorrectCardsQueue.length) return;
+  
+  var card = incorrectCardsQueue[currentCardIndex];
+  
+  // Calculate next review time based on selected difficulty
+  setNextReviewTime(card, difficulty);
+  
+  // Mark the card for removal from error queue
+  incorrectCardsQueue[currentCardIndex] = null;
+  
+  // Move to next card
+  currentCardIndex++;
+  
+  if (currentCardIndex >= incorrectCardsQueue.length) {
+    endErrorReview();
+  } else {
+    displayErrorCard(false);
   }
 }
 
@@ -400,6 +522,13 @@ function updateLevelButtons() {
     button.onclick = createLevelChangeHandler(appLevels[i]);
     levelsContainer.appendChild(button);
   }
+  
+  // Add Starred Filter button
+  var starredFilterBtn = document.createElement("button");
+  starredFilterBtn.id = "starredFilterBtn";
+  starredFilterBtn.textContent = "★ Starred";
+  starredFilterBtn.onclick = toggleStarredFilter;
+  levelsContainer.appendChild(starredFilterBtn);
 }
 
 // Helper to create onclick handlers
@@ -442,6 +571,7 @@ function resetProgress() {
     deck.cards[i].difficulty = 0;
     deck.cards[i].nextReview = new Date().getTime();
     deck.cards[i].history = [];
+    // Preserve starred status on reset progress
   }
   
   currentCardIndex = 0;
@@ -463,6 +593,7 @@ function resetAll() {
   incorrectAnswers = 0;
   incorrectCardsQueue = []; // Clear error queue
   inErrorReviewMode = false;
+  showingStarredOnly = false; // Reset starred filter
   
   displayCurrentCard(false);
   showToast("All data has been reset", 2000);
@@ -504,7 +635,8 @@ function displayErrorCard(showAnswer) {
   var notesElement = document.getElementById("cardNotes");
   var showAnswerBtn = document.getElementById("showAnswerBtn");
   var incorrectBtn = document.getElementById("incorrectBtn");
-  var correctBtn = document.getElementById("correctBtn");
+  var intervalButtons = document.getElementById("intervalButtons");
+  var starButton = document.getElementById("starButton");
   
   // Hide answer elements by default
   backElement.style.display = "none";
@@ -529,17 +661,21 @@ function displayErrorCard(showAnswer) {
   backElement.textContent = card.back;
   notesElement.textContent = card.notes || "";
   
+  // Update star button
+  starButton.style.display = "block";
+  updateStarButton(card.starred);
+  
   // Control button visibility based on answer state
   if (showAnswer) {
     backElement.style.display = "block";
     notesElement.style.display = "block";
     showAnswerBtn.style.display = "none";
     incorrectBtn.style.display = "inline-block";
-    correctBtn.style.display = "inline-block";
+    intervalButtons.style.display = "block";
   } else {
     showAnswerBtn.style.display = "inline-block";
     incorrectBtn.style.display = "none";
-    correctBtn.style.display = "none";
+    intervalButtons.style.display = "none";
   }
   
   // Update progress display
@@ -552,20 +688,19 @@ function answerErrorCard(wasCorrect) {
   
   var card = incorrectCardsQueue[currentCardIndex];
   
-  // Only mark the card for removal if correct
-  if (wasCorrect) {
-    // Remove from error queue on next cycle
-    incorrectCardsQueue[currentCardIndex] = null;
+  // Only handle incorrect answers here
+  if (!wasCorrect) {
+    // Keep in error queue
+    // Move to next card
+    currentCardIndex++;
+    
+    if (currentCardIndex >= incorrectCardsQueue.length) {
+      endErrorReview();
+    } else {
+      displayErrorCard(false);
+    }
   }
-  
-  // Move to next card
-  currentCardIndex++;
-  
-  if (currentCardIndex >= incorrectCardsQueue.length) {
-    endErrorReview();
-  } else {
-    displayErrorCard(false);
-  }
+  // If correct, it will be handled by the interval buttons
 }
 
 // End error review mode
@@ -600,6 +735,60 @@ function handleAnswerCard(wasCorrect) {
   if (inErrorReviewMode) {
     answerErrorCard(wasCorrect);
   } else {
-    answerCard(wasCorrect);
+    if (!wasCorrect) {
+      answerCard(wasCorrect);
+    }
+    // If correct, the interval buttons will handle it
   }
+}
+
+// Toggle starred status of the current card
+function toggleStarCurrentCard() {
+  var dueCards = getDueCards();
+  if (dueCards.length === 0) return;
+  
+  var cardIndex = currentCardIndex % dueCards.length;
+  var card = dueCards[cardIndex];
+  
+  // Toggle starred status
+  card.starred = !card.starred;
+  
+  // Update the star button's appearance
+  updateStarButton(card.starred);
+  
+  // Show toast notification
+  showToast(card.starred ? "Card starred" : "Card unstarred", 1000);
+}
+
+// Update the star button's appearance based on card's starred status
+function updateStarButton(isStarred) {
+  var starButton = document.getElementById("starButton");
+  if (!starButton) return;
+  
+  if (isStarred) {
+    starButton.innerHTML = "★"; // Filled star
+    starButton.classList.add("starred");
+  } else {
+    starButton.innerHTML = "☆"; // Empty star
+    starButton.classList.remove("starred");
+  }
+}
+
+// Toggle showing only starred cards
+function toggleStarredFilter() {
+  showingStarredOnly = !showingStarredOnly;
+  currentCardIndex = 0; // Reset counter when changing filter
+  
+  // Update filter button appearance
+  var starredFilterBtn = document.getElementById("starredFilterBtn");
+  if (starredFilterBtn) {
+    if (showingStarredOnly) {
+      starredFilterBtn.classList.add("active");
+    } else {
+      starredFilterBtn.classList.remove("active");
+    }
+  }
+  
+  updateLevelDisplay();
+  displayCurrentCard(false);
 }
