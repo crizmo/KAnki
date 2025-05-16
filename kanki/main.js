@@ -8,6 +8,7 @@ var fontLoaded = false;
 var incorrectCardsQueue = []; // Queue for storing incorrect cards
 var inErrorReviewMode = false; // Flag to track if we're in error review mode
 var showingStarredOnly = false; // Flag to track if we're showing only starred cards
+var isReversedMode = false; // Flag to track if cards are being shown in reversed mode
 
 // Initialize configuration from vocabulary.js if available
 function initializeConfig() {
@@ -306,8 +307,16 @@ function displayCurrentCard(showAnswer) {
   // Update card content
   levelBadge.style.display = "block";
   levelBadge.textContent = card.level;
-  frontElement.innerHTML = card.front;
-  backElement.textContent = card.back;
+  
+  // In reversed mode, swap front and back
+  if (isReversedMode) {
+    frontElement.innerHTML = card.back;
+    backElement.textContent = card.front;
+  } else {
+    frontElement.innerHTML = card.front;
+    backElement.textContent = card.back;
+  }
+  
   notesElement.textContent = card.notes || "";
   
   // Update star button
@@ -366,6 +375,9 @@ function updateLevelDisplay() {
   if (showingStarredOnly) {
     displayText += " (Starred Only)";
   }
+  
+  // Add direction indicator
+  displayText += " • " + (isReversedMode ? "Native → Target" : "Target → Native");
   
   levelDisplayElement.textContent = displayText;
 }
@@ -529,6 +541,13 @@ function updateLevelButtons() {
   starredFilterBtn.textContent = "★ Starred";
   starredFilterBtn.onclick = toggleStarredFilter;
   levelsContainer.appendChild(starredFilterBtn);
+  
+  // Add Reverse Mode button
+  var reverseToggleBtn = document.createElement("button");
+  reverseToggleBtn.id = "reverseToggleBtn";
+  reverseToggleBtn.textContent = "↔ Reverse";
+  reverseToggleBtn.onclick = toggleCardDirection;
+  levelsContainer.appendChild(reverseToggleBtn);
 }
 
 // Helper to create onclick handlers
@@ -594,6 +613,7 @@ function resetAll() {
   incorrectCardsQueue = []; // Clear error queue
   inErrorReviewMode = false;
   showingStarredOnly = false; // Reset starred filter
+  isReversedMode = false; // Reset card direction
   
   displayCurrentCard(false);
   showToast("All data has been reset", 2000);
@@ -657,8 +677,16 @@ function displayErrorCard(showAnswer) {
   // Update card content
   levelBadge.style.display = "block";
   levelBadge.textContent = card.level;
-  frontElement.innerHTML = card.front;
-  backElement.textContent = card.back;
+  
+  // In reversed mode, swap front and back
+  if (isReversedMode) {
+    frontElement.innerHTML = card.back;
+    backElement.textContent = card.front;
+  } else {
+    frontElement.innerHTML = card.front;
+    backElement.textContent = card.back;
+  }
+  
   notesElement.textContent = card.notes || "";
   
   // Update star button
@@ -791,4 +819,45 @@ function toggleStarredFilter() {
   
   updateLevelDisplay();
   displayCurrentCard(false);
+}
+
+// Toggle between normal and reversed card mode
+function toggleCardDirection() {
+  isReversedMode = !isReversedMode;
+  currentCardIndex = 0; // Reset counter when changing mode
+  
+  // Update toggle button appearance
+  var reverseToggleBtn = document.getElementById("reverseToggleBtn");
+  if (reverseToggleBtn) {
+    if (isReversedMode) {
+      reverseToggleBtn.classList.add("active");
+    } else {
+      reverseToggleBtn.classList.remove("active");
+    }
+  }
+  
+  // Update direction display in UI
+  updateDirectionDisplay();
+  
+  // Refresh card display
+  displayCurrentCard(false);
+  
+  // Show toast notification
+  showToast(isReversedMode ? "Reversed Mode: Native → Target" : "Normal Mode: Target → Native", 2000);
+}
+
+// Update direction display in UI
+function updateDirectionDisplay() {
+  var levelDisplayElement = document.getElementById("levelDisplay");
+  var levelText = "Level: " + (currentLevel === "all" ? "All Levels" : currentLevel);
+  
+  // Add starred status to display if filter is active
+  if (showingStarredOnly) {
+    levelText += " (Starred Only)";
+  }
+  
+  // Add direction indicator
+  levelText += " • " + (isReversedMode ? "Native → Target" : "Target → Native");
+  
+  levelDisplayElement.textContent = levelText;
 }

@@ -264,3 +264,9 @@ h1 {
   background-color: #555;
   color: white;
 }
+
+/* Reverse toggle button styling */
+#reverseToggleBtn.active {
+  background-color: #555;
+  color: white;
+}

@@ -15,6 +15,7 @@ KAnki is a spaced repetition flashcard application designed specifically for jai
 - Customizable vocabulary flashcards with any proficiency levels
 - Filtering by level (JLPT, CEFR, HSK, or any custom system)
 - **Star/favorite system**: Mark important cards and filter by starred items
+- **Reversible cards**: Switch between target language → native and native → target language modes
 - Progress tracking
 - **Error review mode**: Review cards you answered incorrectly right after completing a session
 - **Centralized configuration**: Easy customization through a single configuration file
@@ -175,6 +176,26 @@ KAnki now includes the ability to star or favorite important cards and filter by
   - Creating a custom subset of vocabulary for intensive study
   - Flagging cards you want to review more frequently
 
+## Using the Card Reversal Feature
+
+KAnki now includes the ability to reverse your flashcards, allowing you to practice in both directions:
+
+### How to Use Card Reversal
+
+1. In the level selection area, there's now a "↔ Reverse" button
+2. Tap this button to toggle between:
+   - **Normal Mode** (Target → Native): Shows the target language on the front and your native language on the back
+   - **Reversed Mode** (Native → Target): Shows your native language on the front and the target language on the back
+3. A toast notification will confirm when you change modes
+4. The level display will indicate which mode you're in with "Target → Native" or "Native → Target"
+
+### Additional Notes
+
+- Card reversal mode works with all other features, including:
+  - Level filtering
+  - Star/favorite filtering
+  - Error review mode
+- The reversal setting is reset when using "Reset All Data"
+
 ## Todo
-Have a mode to reverse cards so if you input in the cards spanish -> english you can switch the mode and do it from english -> spanish. 
 Per-card stats showing how many times each card has been seen and when it was last reviewed
