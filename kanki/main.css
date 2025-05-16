@@ -104,13 +104,14 @@ h1 {
   font-style: italic;
 }
 
-#showAnswerBtn, #incorrectBtn, #correctBtn {
-  padding: 10px 20px;
-  margin: 5px;
-  margin-bottom: 15px; /* Add extra space below these buttons */
-  font-size: 1em;
+#showAnswerBtn {
+  padding: 12px 25px;
+  margin: 8px;
+  margin-bottom: 20px;
+  font-size: 1.1em;
   cursor: pointer;
   border: 1px solid #000;
+  min-width: 40%; /* Make show answer button wider */
 }
 
 .correctBtn {
@@ -144,26 +145,29 @@ h1 {
 #intervalButtons {
   text-align: center;
   position: absolute;
-  top: 70px; /* Further increased from 60px to create more space */
+  top: 60px; /* Moved up slightly now that incorrect button is gone */
   left: 0;
   right: 0;
   width: 100%;
-  height: 80px; /* Increased height for interval buttons section */
+  height: 90px; /* Increased height for better spacing */
 }
 
 .intervalBtn {
-  padding: 8px 12px;
-  margin: 10px 6px; /* Further increased vertical and horizontal margins */
-  font-size: 0.9em;
+  padding: 10px 15px; /* Increased padding */
+  margin: 12px 8px; /* Increased margins */
+  font-size: 0.95em;
   cursor: pointer;
   border: 1px solid #000;
-  min-width: 60px;
+  min-width: 70px; /* Wider buttons */
   display: inline-block;
 }
 
 .againBtn {
   background-color: #222222;
   color: white;
+  font-weight: bold; /* Make 'Again' button more prominent */
+  border-width: 2px; /* Make border thicker for emphasis */
+  min-width: 75px; /* Make slightly wider than other interval buttons */
 }
 
 .hardBtn {
