@@ -143,6 +143,37 @@ function createDefaultDeck() {
   return deck;
 }
 
+// Save deck to localStorage
+function saveDeck() {
+  if (deck) {
+    try {
+      localStorage.setItem('kanki_deck', JSON.stringify(deck));
+      log("Deck saved to localStorage");
+    } catch (e) {
+      log("Error saving deck: " + e.message);
+    }
+  }
+}
+
+// Load deck from localStorage or create a new one if none exists
+function loadDeck() {
+  try {
+    var savedDeck = localStorage.getItem('kanki_deck');
+    if (savedDeck) {
+      deck = JSON.parse(savedDeck);
+      log("Loaded saved deck with " + deck.cards.length + " cards");
+      return true;
+    }
+  } catch (e) {
+    log("Error loading deck: " + e.message);
+  }
+  
+  // If no saved deck or error, create a new one
+  deck = createDefaultDeck();
+  log("Created new default deck");
+  return false;
+}
+
 // Update status message for notifications (not confirmations)
 function updateStatusMessage(message) {
   var statusElement = document.getElementById("statusMessage");
@@ -224,6 +255,8 @@ function calculateNextReview(card, wasCorrect) {
     card.difficulty = 0;
     card.nextReview = now + (10 * 60 * 1000); // 10 minutes
   }
+  
+  saveDeck();
   
   return card;
 }
@@ -358,6 +391,8 @@ function displayCurrentCard(showAnswer) {
   if (!showAnswer) { 
     card.timesViewed = (card.timesViewed || 0) + 1;
     card.lastViewed = new Date().getTime();
+    // Save view statistics
+    saveDeck();
   }
   
   updateCardStats(card);
@@ -454,6 +489,9 @@ function answerCard(wasCorrect) {
   
   currentCardIndex++;
   
+
+  saveDeck();
+  
   // Check if we're done with regular cards and have errors to review
   if (!inErrorReviewMode && currentCardIndex % dueCards.length === 0 && incorrectCardsQueue.length > 0) {
     showErrorReviewPrompt();
@@ -480,6 +518,8 @@ function handleAnswerWithInterval(difficulty) {
     
     currentCardIndex++;
     
+    saveDeck();
+    
     // Check if we're done with regular cards and have errors to review
     if (currentCardIndex % dueCards.length === 0 && incorrectCardsQueue.length > 0) {
       showErrorReviewPrompt();
@@ -505,6 +545,8 @@ function answerErrorCardWithInterval(difficulty) {
   // Move to next card
   currentCardIndex++;
   
+  saveDeck();
+  
   if (currentCardIndex >= incorrectCardsQueue.length) {
     endErrorReview();
   } else {
@@ -518,6 +560,9 @@ function changeLevel(level) {
   currentCardIndex = 0; // Reset counter when changing level
   updateLevelDisplay();
   displayCurrentCard(false);
+  
+  // Save user preference for level
+  saveDeck();
 }
 
 // Initialize app on page load
@@ -532,8 +577,10 @@ function onPageLoad() {
 
   updateLevelButtons();
 
-  deck = createDefaultDeck();
-  log("Created new default deck");
+  if (!loadDeck()) {
+    deck = createDefaultDeck();
+    log("Created new default deck");
+  }
 
   updateProgressDisplay();
   
@@ -616,6 +663,7 @@ function resetProgress() {
   inErrorReviewMode = false;
   
   displayCurrentCard(false);
+  saveDeck();
   showToast("Progress has been reset", 2000);
   log("Progress reset");
 }
@@ -632,6 +680,7 @@ function resetAll() {
   isReversedMode = false;
   
   displayCurrentCard(false);
+  saveDeck();
   showToast("All data has been reset", 2000);
   log("Complete reset performed");
 }
@@ -760,6 +809,7 @@ function endErrorReview() {
     currentCardIndex = 0;
     displayCurrentCard(false);
   }
+  saveDeck();
 }
 
 function handleAnswerCard(wasCorrect) {
@@ -769,6 +819,7 @@ function handleAnswerCard(wasCorrect) {
     if (!wasCorrect) {
       answerCard(wasCorrect);
     }
+    saveDeck();
   }
 }
 
@@ -783,6 +834,7 @@ function toggleStarCurrentCard() {
   
   updateStarButton(card.starred);
   
+  saveDeck();
   showToast(card.starred ? "Card starred" : "Card unstarred", 1000);
 }
 
@@ -814,6 +866,9 @@ function toggleStarredFilter() {
   
   updateLevelDisplay();
   displayCurrentCard(false);
+  
+  // Save user preference for starred filter
+  saveDeck();
 }
 
 function toggleCardDirection() {
@@ -831,6 +886,9 @@ function toggleCardDirection() {
   updateDirectionDisplay();
   
   displayCurrentCard(false);
+  
+  // Save user preference for card direction
+  saveDeck();
   
   showToast(isReversedMode ? "Reversed Mode: Native → Target" : "Normal Mode: Target → Native", 2000);
 }
