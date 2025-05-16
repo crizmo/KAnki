@@ -36,6 +36,16 @@ h1 {
   border: 1px solid #000;
 }
 
+/* Specific styles for level buttons container */
+#levelButtons {
+  margin-bottom: 30px; /* Increase bottom margin to accommodate two rows */
+  padding-bottom: 10px; /* Add padding for visual separation */
+}
+
+#starredFilterBtn, #reverseToggleBtn {
+  margin-top: 10px; /* Ensure consistent top margin */
+}
+
 .card {
   background-color: white;
   border-radius: 5px;
@@ -44,7 +54,9 @@ h1 {
   margin: 20px auto;
   max-width: 80%;
   position: relative;
-  min-height: 250px;
+  height: 300px; /* Fixed height instead of min-height */
+  overflow: hidden; /* Prevent content overflow */
+  border: 1px solid #000000; /* Added border */
 }
 
 .levelBadge {
@@ -64,6 +76,7 @@ h1 {
   margin-bottom: 20px;
   margin-top: 15px;
   font-family: 'LanguageFont', sans-serif;
+  min-height: 60px; /* Fixed minimum height */
 }
 
 .cardBack {
@@ -71,6 +84,7 @@ h1 {
   margin-bottom: 10px;
   padding-top: 15px;
   border-top: 1px solid #eee;
+  min-height: 50px; /* Fixed minimum height */
 }
 
 .cardNotes {
@@ -93,6 +107,7 @@ h1 {
 #showAnswerBtn, #incorrectBtn, #correctBtn {
   padding: 10px 20px;
   margin: 5px;
+  margin-bottom: 15px; /* Add extra space below these buttons */
   font-size: 1em;
   cursor: pointer;
   border: 1px solid #000;
@@ -119,22 +134,26 @@ h1 {
 }
 
 #controlButtons {
-  min-height: 120px; 
+  height: 160px; /* Further increased from 140px to provide more vertical space */
   position: relative;
-  margin: 20px 0;
+  margin: 20px 0 30px 0; /* Increased bottom margin from 20px to 30px */
   text-align: center;
+  overflow: hidden; /* Prevent content overflow */
 }
 
 #intervalButtons {
   text-align: center;
-  margin: 0 auto;
+  position: absolute;
+  top: 70px; /* Further increased from 60px to create more space */
+  left: 0;
+  right: 0;
   width: 100%;
-  margin-top: 10px;
+  height: 80px; /* Increased height for interval buttons section */
 }
 
 .intervalBtn {
   padding: 8px 12px;
-  margin: 5px;
+  margin: 10px 6px; /* Further increased vertical and horizontal margins */
   font-size: 0.9em;
   cursor: pointer;
   border: 1px solid #000;

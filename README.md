@@ -20,6 +20,7 @@ KAnki is a spaced repetition flashcard application designed specifically for jai
 - Progress tracking
 - **Error review mode**: Review cards you answered incorrectly right after completing a session
 - **Centralized configuration**: Easy customization through a single configuration file
+- **E-ink optimized UI**: Fixed element heights and visibility management to minimize screen refreshes
 
 ## Technical Limitations
 

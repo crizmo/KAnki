@@ -45,6 +45,50 @@ function loadLanguageFont() {
   }, 1000);
 }
 
+// Initialize fixed element heights to prevent layout shifts on e-ink display
+function initializeFixedHeights() {
+  log("Initializing fixed element heights for e-ink optimization...");
+  
+  var cardContainer = document.getElementById("cardContainer");
+  var controlButtons = document.getElementById("controlButtons");
+  var intervalButtons = document.getElementById("intervalButtons");
+  
+  // Set fixed heights directly in JavaScript to override CSS
+  if (cardContainer) {
+    cardContainer.style.height = "300px"; // Match CSS height
+    cardContainer.style.overflow = "hidden";
+  }
+  
+  if (controlButtons) {
+    controlButtons.style.height = "160px"; // Match CSS height
+    controlButtons.style.overflow = "hidden";
+  }
+  
+  if (intervalButtons) {
+    // Pre-render the interval buttons to ensure proper dimensions
+    // This reduces flicker when toggling visibility
+    intervalButtons.style.display = "block";
+    intervalButtons.style.visibility = "hidden";
+    intervalButtons.style.top = "70px"; // Ensure JS matches CSS value
+    
+    // Force browser to calculate the layout
+    var forceLayout = intervalButtons.offsetHeight;
+  }
+  
+  // Pre-render answer elements to avoid layout shifts
+  var backElement = document.getElementById("cardBack");
+  if (backElement) {
+    backElement.style.minHeight = "50px";
+  }
+  
+  var notesElement = document.getElementById("cardNotes");
+  if (notesElement) {
+    notesElement.style.minHeight = "20px";
+  }
+  
+  log("Fixed element heights initialized");
+}
+
 // Create flashcard deck data structure
 function createDeck() {
   return {
@@ -288,7 +332,9 @@ function displayCurrentCard(showAnswer) {
     levelBadge.style.display = "none";
     showAnswerBtn.style.display = "none";
     incorrectBtn.style.display = "none";
-    intervalButtons.style.display = "none";
+    // Keep intervalButtons in layout but hidden
+    intervalButtons.style.display = "block";
+    intervalButtons.style.visibility = "hidden";
     starButton.style.display = "none"; // Hide star button
     document.getElementById("cardStats").style.display = "none"; // Hide stats
     
@@ -336,9 +382,6 @@ function displayCurrentCard(showAnswer) {
   // Update and display card statistics
   updateCardStats(card);
   
-  // Update card statistics
-  updateCardStats(card);
-  
   // Control button visibility based on answer state
   if (showAnswer) {
     backElement.style.display = "block";
@@ -346,10 +389,13 @@ function displayCurrentCard(showAnswer) {
     showAnswerBtn.style.display = "none";
     incorrectBtn.style.display = "inline-block";
     intervalButtons.style.display = "block";
+    intervalButtons.style.visibility = "visible";
   } else {
     showAnswerBtn.style.display = "inline-block";
     incorrectBtn.style.display = "none";
-    intervalButtons.style.display = "none";
+    // Keep intervalButtons in layout but hidden
+    intervalButtons.style.display = "block";
+    intervalButtons.style.visibility = "hidden";
   }
   
   // Update progress display
@@ -518,6 +564,9 @@ function onPageLoad() {
   // Load language font
   loadLanguageFont();
   
+  // Initialize fixed heights
+  initializeFixedHeights();
+  
   // Update level buttons based on appLevels
   updateLevelButtons();
   
@@ -551,11 +600,16 @@ function updateLevelButtons() {
     levelsContainer.appendChild(button);
   }
   
-  // Add Starred Filter button
+  // Add a line break to put starred and reverse buttons on next line
+  var lineBreak = document.createElement("br");
+  levelsContainer.appendChild(lineBreak);
+  
+  // Add Starred Filter button on the new line
   var starredFilterBtn = document.createElement("button");
   starredFilterBtn.id = "starredFilterBtn";
   starredFilterBtn.textContent = "★ Starred";
   starredFilterBtn.onclick = toggleStarredFilter;
+  starredFilterBtn.style.marginTop = "10px"; // Add top margin for spacing
   levelsContainer.appendChild(starredFilterBtn);
   
   // Add Reverse Mode button
@@ -563,6 +617,7 @@ function updateLevelButtons() {
   reverseToggleBtn.id = "reverseToggleBtn";
   reverseToggleBtn.textContent = "↔ Reverse";
   reverseToggleBtn.onclick = toggleCardDirection;
+  reverseToggleBtn.style.marginTop = "10px"; // Add top margin for spacing
   levelsContainer.appendChild(reverseToggleBtn);
 }
 
@@ -721,9 +776,6 @@ function displayErrorCard(showAnswer) {
   // Update and display card statistics
   updateCardStats(card);
   
-  // Update card statistics
-  updateCardStats(card);
-  
   // Control button visibility based on answer state
   if (showAnswer) {
     backElement.style.display = "block";
@@ -731,10 +783,13 @@ function displayErrorCard(showAnswer) {
     showAnswerBtn.style.display = "none";
     incorrectBtn.style.display = "inline-block";
     intervalButtons.style.display = "block";
+    intervalButtons.style.visibility = "visible";
   } else {
     showAnswerBtn.style.display = "inline-block";
     incorrectBtn.style.display = "none";
-    intervalButtons.style.display = "none";
+    // Keep intervalButtons in layout but hidden
+    intervalButtons.style.display = "block";
+    intervalButtons.style.visibility = "hidden";
   }
   
   // Update progress display
