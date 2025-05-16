@@ -116,7 +116,7 @@ function createCard(front, reading, back, notes, level, difficulty) {
 function createDefaultDeck() {
   var deck = createDeck();
   
-  if (typeof VOCABULARY !== 'undefined') {y
+  if (typeof VOCABULARY !== 'undefined') {
     for (var level in VOCABULARY) {
       if (VOCABULARY.hasOwnProperty(level)) {
         for (var i = 0; i < VOCABULARY[level].length; i++) {
