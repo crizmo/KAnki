@@ -68,7 +68,9 @@ function createCard(front, reading, back, notes, level, difficulty) {
     difficulty: difficulty || 0,
     nextReview: new Date().getTime(),
     history: [],
-    starred: false // Add starred property, default to false
+    starred: false,
+    timesViewed: 0,
+    lastViewed: null
   };
 }
 
@@ -288,6 +290,7 @@ function displayCurrentCard(showAnswer) {
     incorrectBtn.style.display = "none";
     intervalButtons.style.display = "none";
     starButton.style.display = "none"; // Hide star button
+    document.getElementById("cardStats").style.display = "none"; // Hide stats
     
     // Check if we have incorrect cards to review
     if (incorrectCardsQueue.length > 0) {
@@ -300,6 +303,7 @@ function displayCurrentCard(showAnswer) {
   
   // Show card container
   cardContainer.style.display = "block";
+  document.getElementById("cardStats").style.display = "block"; // Show stats
   
   // Get current card
   var card = dueCards[currentCardIndex % dueCards.length];
@@ -322,6 +326,18 @@ function displayCurrentCard(showAnswer) {
   // Update star button
   starButton.style.display = "block";
   updateStarButton(card.starred);
+  
+  // Update card view statistics
+  if (!showAnswer) { // Only increment on initial card view, not when showing answer
+    card.timesViewed = (card.timesViewed || 0) + 1;
+    card.lastViewed = new Date().getTime();
+  }
+  
+  // Update and display card statistics
+  updateCardStats(card);
+  
+  // Update card statistics
+  updateCardStats(card);
   
   // Control button visibility based on answer state
   if (showAnswer) {
@@ -590,7 +606,8 @@ function resetProgress() {
     deck.cards[i].difficulty = 0;
     deck.cards[i].nextReview = new Date().getTime();
     deck.cards[i].history = [];
-    // Preserve starred status on reset progress
+    // Preserve starred status and view statistics on reset progress
+    // (only reset learning progress, not usage data)
   }
   
   currentCardIndex = 0;
@@ -614,6 +631,7 @@ function resetAll() {
   inErrorReviewMode = false;
   showingStarredOnly = false; // Reset starred filter
   isReversedMode = false; // Reset card direction
+  // Card statistics are reset by creating a new deck with default values
   
   displayCurrentCard(false);
   showToast("All data has been reset", 2000);
@@ -670,6 +688,7 @@ function displayErrorCard(showAnswer) {
   
   // Show card container
   cardContainer.style.display = "block";
+  document.getElementById("cardStats").style.display = "block"; // Show stats
   
   // Get current error card
   var card = incorrectCardsQueue[currentCardIndex];
@@ -692,6 +711,18 @@ function displayErrorCard(showAnswer) {
   // Update star button
   starButton.style.display = "block";
   updateStarButton(card.starred);
+  
+  // Update card view statistics
+  if (!showAnswer) { // Only increment on initial card view, not when showing answer
+    card.timesViewed = (card.timesViewed || 0) + 1;
+    card.lastViewed = new Date().getTime();
+  }
+  
+  // Update and display card statistics
+  updateCardStats(card);
+  
+  // Update card statistics
+  updateCardStats(card);
   
   // Control button visibility based on answer state
   if (showAnswer) {
@@ -860,4 +891,58 @@ function updateDirectionDisplay() {
   levelText += " • " + (isReversedMode ? "Native → Target" : "Target → Native");
   
   levelDisplayElement.textContent = levelText;
+}
+
+// Update and display card statistics
+function updateCardStats(card) {
+  var statsElement = document.getElementById("cardStats");
+  if (!statsElement || !card) return;
+  
+  // Calculate statistics
+  var totalViews = card.timesViewed || 0;
+  var correctAnswers = 0;
+  var incorrectAnswers = 0;
+  var lastViewed = card.lastViewed ? new Date(card.lastViewed) : null;
+  
+  // Count correct and incorrect answers from history
+  if (card.history && card.history.length > 0) {
+    for (var i = 0; i < card.history.length; i++) {
+      if (card.history[i].result === true) {
+        correctAnswers++;
+      } else {
+        incorrectAnswers++;
+      }
+    }
+  }
+  
+  // Format the last viewed date in a user-friendly way
+  var lastViewedText = "never";
+  if (lastViewed) {
+    // Simple date formatting without libraries
+    var now = new Date();
+    var diffMs = now - lastViewed;
+    var diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    var diffHours = Math.floor(diffMs / (1000 * 60 * 60)) % 24;
+    var diffMins = Math.floor(diffMs / (1000 * 60)) % 60;
+    
+    if (diffDays > 0) {
+      lastViewedText = diffDays + " day" + (diffDays !== 1 ? "s" : "") + " ago";
+    } else if (diffHours > 0) {
+      lastViewedText = diffHours + " hour" + (diffHours !== 1 ? "s" : "") + " ago";
+    } else if (diffMins > 0) {
+      lastViewedText = diffMins + " minute" + (diffMins !== 1 ? "s" : "") + " ago";
+    } else {
+      lastViewedText = "just now";
+    }
+  }
+  
+  // Calculate accuracy percentage
+  var totalAnswers = correctAnswers + incorrectAnswers;
+  var accuracyText = totalAnswers > 0 ? 
+    Math.round((correctAnswers / totalAnswers) * 100) + "% accuracy" : 
+    "no answers yet";
+  
+  // Build stats text
+  statsElement.innerHTML = "Viewed " + totalViews + " time" + (totalViews !== 1 ? "s" : "") + 
+    " • Last: " + lastViewedText + " • " + accuracyText;
 }

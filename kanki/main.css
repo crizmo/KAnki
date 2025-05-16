@@ -81,6 +81,17 @@ h1 {
   font-style: italic;
 }
 
+/* Card statistics styling */
+.cardStats {
+  font-size: 0.7em;
+  color: #888;
+  text-align: right;
+  margin-top: 15px;
+  padding-top: 5px;
+  border-top: 1px dashed #eee;
+  font-style: italic;
+}
+
 #showAnswerBtn, #incorrectBtn, #correctBtn {
   padding: 10px 20px;
   margin: 5px;

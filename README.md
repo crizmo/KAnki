@@ -16,6 +16,7 @@ KAnki is a spaced repetition flashcard application designed specifically for jai
 - Filtering by level (JLPT, CEFR, HSK, or any custom system)
 - **Star/favorite system**: Mark important cards and filter by starred items
 - **Reversible cards**: Switch between target language → native and native → target language modes
+- **Per-card statistics**: Track how many times each card has been viewed and review history
 - Progress tracking
 - **Error review mode**: Review cards you answered incorrectly right after completing a session
 - **Centralized configuration**: Easy customization through a single configuration file
@@ -197,5 +198,22 @@ KAnki now includes the ability to reverse your flashcards, allowing you to pract
   - Error review mode
 - The reversal setting is reset when using "Reset All Data"
 
-## Todo
-Per-card stats showing how many times each card has been seen and when it was last reviewed
+## Card Statistics
+
+KAnki now tracks and displays statistics for each flashcard:
+
+### What Statistics Are Displayed
+
+- **View Count**: The number of times a card has been shown
+- **Last Viewed**: When the card was last reviewed (displayed as a relative time, e.g., "2 days ago")
+- **Accuracy**: Percentage of correct answers for this card
+
+### Where to Find Statistics
+
+Statistics appear at the bottom of each card in a subtle, non-distracting format. They are updated in real-time as you study, giving you insight into your learning patterns and progress with individual vocabulary items.
+
+### Benefits of Card Statistics
+
+- Track which words you see most frequently
+- Identify challenging cards based on accuracy percentage
+- Monitor your study patterns over time

@@ -17,4 +17,12 @@
 - **Enhanced learning**: Practice both recognition and production skills
 - **Full compatibility**: Works with all other features (stars, level filters, error review)
 
-Both features help customize your learning experience for more effective vocabulary acquisition.
+## Card Statistics
+
+- **Automatic tracking**: KAnki now tracks views and performance for each card
+- **View count**: See how many times you've encountered each word
+- **Last viewed**: Know when you last studied a specific card
+- **Accuracy**: Track your performance with percentage of correct answers
+- **Real-time updates**: Statistics update as you study, providing immediate feedback
+
+These features help customize your learning experience for more effective vocabulary acquisition.
