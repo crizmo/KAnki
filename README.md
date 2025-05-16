@@ -20,6 +20,7 @@ KAnki is a spaced repetition flashcard application designed specifically for jai
 - **Error review mode**: Review cards you answered incorrectly right after completing a session
 - **Centralized configuration**: Easy customization through a single configuration file
 - **E-ink optimized UI**: Fixed element heights and visibility management to minimize screen refreshes
+- **Data persistence**: All study progress and card statistics are automatically saved between sessions
 
 ## Technical Limitations
 
@@ -110,6 +111,20 @@ For languages with different writing systems, use the `reading` property:
 ```javascript
 {"front": "こんにちは", "reading": "konnichiwa", "back": "Hello", "notes": "Greeting"}
 ```
+
+## Data Storage
+
+KAnki saves your progress and card statistics using the Kindle's localStorage feature. All your data is stored locally on your device at:
+
+```
+/Kindle/.active_content_sandbox/kanki/resource/LocalStorage/file__0.localstorage
+```
+
+If you ever want to reset all progress or encounter issues with saved data, you can:
+
+1. Delete this file to completely reset the application data
+2. Use the "Reset Progress" button within the app to only reset card progress while keeping your deck intact
+3. Use the "Reset All" button to return to the default deck and clear all progress
 
 ## Development
 
