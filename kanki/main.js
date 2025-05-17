@@ -493,20 +493,23 @@ function updateProgressDisplay() {
   var progressElement = document.getElementById("progressDisplay");
   
   if (inErrorReviewMode) {
-    progressElement.textContent = "Error: " + (currentCardIndex + 1) + 
-      "/" + incorrectCardsQueue.length + " • C: " + correctAnswers + 
-      " • I: " + incorrectAnswers;
-  } else {
-    var dueCards = getDueCards();
-    
-    if (dueCards.length === 0) {
-      progressElement.textContent = "All caught up!";
-    } else {
-      progressElement.textContent = "Card: " + (currentCardIndex % dueCards.length + 1) + 
-          "/" + dueCards.length + " • C: " + correctAnswers + 
-          " • I: " + incorrectAnswers;
-    }
+    progressElement.textContent = "Error Review: Card " + (currentCardIndex + 1) + 
+      " of " + incorrectCardsQueue.length + " • Correct: " + correctAnswers + 
+      " • Incorrect: " + incorrectAnswers;
+    return;
   }
+  
+  var dueCards = getDueCards();
+  
+  if (dueCards.length === 0) {
+    progressElement.textContent = "All caught up! No cards to review.";
+    return;
+  }
+  
+  progressElement.textContent = "Card " + (currentCardIndex % dueCards.length + 1) + 
+      " of " + dueCards.length + " • Correct: " + correctAnswers + 
+      " • Incorrect: " + incorrectAnswers;
+  
 
   updateLevelDisplay();
 }
@@ -514,18 +517,15 @@ function updateProgressDisplay() {
 
 function updateLevelDisplay() {
   var levelDisplayElement = document.getElementById("levelDisplay");
-  
-  // Set the level display text
-  var displayText = "Level: " + (currentLevel === "all" ? "All" : currentLevel);
+  var displayText = "Level: " + (currentLevel === "all" ? "All Levels" : currentLevel);
+
   if (showingStarredOnly) {
-    displayText += " (★)";
+    displayText += " (Starred Only)";
   }
+ 
+  displayText += " • " + (isReversedMode ? "Native → Target" : "Target → Native");
   
-  var directionText = (isReversedMode ? "Native → Target" : "Target → Native");
-  levelDisplayElement.textContent = displayText + " • " + directionText;
-  
-  // Update button statuses to reflect current state
-  updateMenuButtonStatus();
+  levelDisplayElement.textContent = displayText;
 }
 
 
@@ -641,13 +641,9 @@ function answerErrorCardWithInterval(difficulty) {
 
 // Change the currently selected level
 function changeLevel(level) {
-  // Update current level
   currentLevel = level;
   currentCardIndex = 0; // Reset counter when changing level
-  
-  // Update UI
   updateLevelDisplay();
-  updateMenuButtonStatus(); // Update button active states
   displayCurrentCard(false);
   
   // Save user preference for level
@@ -682,43 +678,36 @@ function onPageLoad() {
 
 // Update level buttons dynamically based on appLevels
 function updateLevelButtons() {
-  var levelsToolbar = document.getElementById("levelToolbar");
-  if (!levelsToolbar) return;
+  var levelsContainer = document.getElementById("levelButtons");
+  if (!levelsContainer) return;
   
-  // Clear existing level buttons except the "All" button
-  while (levelsToolbar.children.length > 1) {
-    levelsToolbar.removeChild(levelsToolbar.lastChild);
+  while (levelsContainer.children.length > 1) {
+    levelsContainer.removeChild(levelsContainer.lastChild);
   }
   
-  // Add a level button for each level
   for (var i = 0; i < appLevels.length; i++) {
     var button = document.createElement("button");
     button.textContent = appLevels[i];
-    button.classList.add("level-button");
-    button.setAttribute("data-level", appLevels[i]);
     button.onclick = createLevelChangeHandler(appLevels[i]);
-    
-    // Mark active if this is the current level
-    if (appLevels[i] === currentLevel) {
-      button.classList.add("active");
-    }
-    
-    levelsToolbar.appendChild(button);
+    levelsContainer.appendChild(button);
   }
   
-  // Update All button active state
-  var allButton = levelsToolbar.querySelector(".all-button");
-  if (allButton) {
-    allButton.setAttribute("data-level", "all");
-    if (currentLevel === "all") {
-      allButton.classList.add("active");
-    } else {
-      allButton.classList.remove("active");
-    }
-  }
+  var lineBreak = document.createElement("br");
+  levelsContainer.appendChild(lineBreak);
   
-  // Update the status of other buttons
-  updateMenuButtonStatus();
+  var starredFilterBtn = document.createElement("button");
+  starredFilterBtn.id = "starredFilterBtn";
+  starredFilterBtn.textContent = "★ Starred";
+  starredFilterBtn.onclick = toggleStarredFilter;
+  starredFilterBtn.style.marginTop = "10px"; 
+  levelsContainer.appendChild(starredFilterBtn);
+  
+  var reverseToggleBtn = document.createElement("button");
+  reverseToggleBtn.id = "reverseToggleBtn";
+  reverseToggleBtn.textContent = "↔ Reverse";
+  reverseToggleBtn.onclick = toggleCardDirection;
+  reverseToggleBtn.style.marginTop = "10px"; 
+  levelsContainer.appendChild(reverseToggleBtn);
 }
 
 function createLevelChangeHandler(level) {
@@ -1042,48 +1031,4 @@ function updateCardStats(card) {
   
   statsElement.innerHTML = "Viewed " + totalViews + " time" + (totalViews !== 1 ? "s" : "") + 
     " • Last: " + lastViewedText;
-}
-
-// Toggle level menu popup visibility
-// Update the status of toolbar buttons based on current state
-function updateMenuButtonStatus() {
-  var starredBtn = document.getElementById("starredFilterBtn");
-  var reverseBtn = document.getElementById("reverseToggleBtn");
-  var levelButtons = document.querySelectorAll(".level-button");
-  
-  // Update starred filter button
-  if (starredBtn) {
-    if (showingStarredOnly) {
-      starredBtn.classList.add("active");
-      starredBtn.style.backgroundColor = "#555";
-      starredBtn.style.color = "white";
-    } else {
-      starredBtn.classList.remove("active");
-      starredBtn.style.backgroundColor = "";
-      starredBtn.style.color = "";
-    }
-  }
-  
-  // Update reverse mode button
-  if (reverseBtn) {
-    if (isReversedMode) {
-      reverseBtn.classList.add("active");
-      reverseBtn.style.backgroundColor = "#555";
-      reverseBtn.style.color = "white";
-    } else {
-      reverseBtn.classList.remove("active");
-      reverseBtn.style.backgroundColor = "";
-      reverseBtn.style.color = "";
-    }
-  }
-  
-  // Update level buttons
-  levelButtons.forEach(function(button) {
-    var level = button.getAttribute("data-level");
-    if (level === currentLevel) {
-      button.classList.add("active");
-    } else {
-      button.classList.remove("active");
-    }
-  });
 }
