@@ -16,15 +16,28 @@
 <body onload="onPageLoad()">
   <div id="log" style="display:none;"></div>
 
-  <h1 id="title">KAnki</h1>
-  <div style="text-align: center;">
-    <div id="progressDisplay" class="progressBar"></div>
-    <div id="levelDisplay" class="levelDisplay"></div>
-  </div>
-  
-  <div id="levelButtons" class="buttonContainer">
-    <button onclick="changeLevel('all')">All Levels</button>
-    <!-- Other level buttons will be added dynamically by JavaScript -->
+  <div id="headerBar">
+    <div class="topBar">
+      <div class="logoArea">
+        <h1 id="title">KAnki</h1>
+      </div>
+      <div class="infoArea">
+        <div id="progressDisplay" class="progressBar"></div>
+        <div id="levelDisplay" class="levelDisplay"></div>
+      </div>
+    </div>
+    <div class="menuBar">
+      <div id="levelButtons" class="menuSection">
+        <button onclick="changeLevel('all')">All Levels</button>
+        <!-- Other level buttons will be added dynamically by JavaScript -->
+      </div>
+      <div class="menuDivider"></div>
+      <div id="toolButtons" class="menuSection">
+        <button id="starredFilterBtn" onclick="toggleStarredFilter()">★ Star</button>
+        <button id="reverseToggleBtn" onclick="toggleCardDirection()">↔ Flip</button>
+        <button id="updateBtn" onclick="window.location.reload();">↻ Update</button>
+      </div>
+    </div>
   </div>
   
   <div id="mainContainer">
@@ -55,7 +68,6 @@
     <div class="buttonContainer">
       <button onclick="showResetProgressConfirm()">Reset Progress</button>
       <button onclick="showResetAllConfirm()">Reset All Data</button>
-      <button onclick="window.location.reload();">Update</button>
     </div>
   </div>
   

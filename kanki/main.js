@@ -493,22 +493,22 @@ function updateProgressDisplay() {
   var progressElement = document.getElementById("progressDisplay");
   
   if (inErrorReviewMode) {
-    progressElement.textContent = "Error Review: Card " + (currentCardIndex + 1) + 
-      " of " + incorrectCardsQueue.length + " • Correct: " + correctAnswers + 
-      " • Incorrect: " + incorrectAnswers;
+    progressElement.textContent = "⚠️ " + (currentCardIndex + 1) + 
+      "/" + incorrectCardsQueue.length + " • ✓" + correctAnswers + 
+      " • ✗" + incorrectAnswers;
     return;
   }
   
   var dueCards = getDueCards();
   
   if (dueCards.length === 0) {
-    progressElement.textContent = "All caught up! No cards to review.";
+    progressElement.textContent = "✓ Done!";
     return;
   }
   
-  progressElement.textContent = "Card " + (currentCardIndex % dueCards.length + 1) + 
-      " of " + dueCards.length + " • Correct: " + correctAnswers + 
-      " • Incorrect: " + incorrectAnswers;
+  progressElement.textContent = "📝 " + (currentCardIndex % dueCards.length + 1) + 
+      "/" + dueCards.length + " • ✓" + correctAnswers + 
+      " • ✗" + incorrectAnswers;
   
 
   updateLevelDisplay();
@@ -517,13 +517,13 @@ function updateProgressDisplay() {
 
 function updateLevelDisplay() {
   var levelDisplayElement = document.getElementById("levelDisplay");
-  var displayText = "Level: " + (currentLevel === "all" ? "All Levels" : currentLevel);
+  var displayText = (currentLevel === "all" ? "All" : currentLevel);
 
   if (showingStarredOnly) {
-    displayText += " (Starred Only)";
+    displayText += " ★";
   }
  
-  displayText += " • " + (isReversedMode ? "Native → Target" : "Target → Native");
+  displayText += " • " + (isReversedMode ? "Native→Target" : "Target→Native");
   
   levelDisplayElement.textContent = displayText;
 }
@@ -670,6 +670,18 @@ function onPageLoad() {
     deck = createDefaultDeck();
     log("Created new default deck");
   }
+  
+  // Update menu button states
+  var starredFilterBtn = document.getElementById("starredFilterBtn");
+  var reverseToggleBtn = document.getElementById("reverseToggleBtn");
+  
+  if (starredFilterBtn && showingStarredOnly) {
+    starredFilterBtn.classList.add("active");
+  }
+  
+  if (reverseToggleBtn && isReversedMode) {
+    reverseToggleBtn.classList.add("active");
+  }
 
   updateProgressDisplay();
   
@@ -695,19 +707,7 @@ function updateLevelButtons() {
   var lineBreak = document.createElement("br");
   levelsContainer.appendChild(lineBreak);
   
-  var starredFilterBtn = document.createElement("button");
-  starredFilterBtn.id = "starredFilterBtn";
-  starredFilterBtn.textContent = "★ Starred";
-  starredFilterBtn.onclick = toggleStarredFilter;
-  starredFilterBtn.style.marginTop = "10px"; 
-  levelsContainer.appendChild(starredFilterBtn);
-  
-  var reverseToggleBtn = document.createElement("button");
-  reverseToggleBtn.id = "reverseToggleBtn";
-  reverseToggleBtn.textContent = "↔ Reverse";
-  reverseToggleBtn.onclick = toggleCardDirection;
-  reverseToggleBtn.style.marginTop = "10px"; 
-  levelsContainer.appendChild(reverseToggleBtn);
+  // These buttons are now in the HTML directly
 }
 
 function createLevelChangeHandler(level) {
@@ -975,7 +975,7 @@ function toggleCardDirection() {
   // Save user preference for card direction
   saveDeck();
   
-  showToast(isReversedMode ? "Reversed Mode: Native → Target" : "Normal Mode: Target → Native", 2000);
+  showToast(isReversedMode ? "Flip: Native → Target" : "Flip: Target → Native", 1500);
 }
 
 function updateDirectionDisplay() {
