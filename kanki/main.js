@@ -56,8 +56,8 @@ function initializeFixedHeights() {
   
   // Set dimensions based on screen size
   var cardHeight = "300px";
-  var controlHeight = "160px"; 
-  var intervalTop = "70px";
+  var controlHeight = "100px"; // Reduced control height
+  var intervalTop = "0px"; // Interval buttons appear at the top of the control section now
   var backMinHeight = "50px";
   var notesMinHeight = "20px";
   
@@ -65,22 +65,22 @@ function initializeFixedHeights() {
   if (viewport.width >= 1800 || viewport.height >= 2400) {
     // Kindle Scribe
     cardHeight = "700px";
-    controlHeight = "320px";
-    intervalTop = "130px";
+    controlHeight = "160px"; // Reduced from 320px
+    intervalTop = "0px";
     backMinHeight = "120px";
     notesMinHeight = "40px";
   } else if (viewport.width >= 1050 || viewport.height >= 1400) {
     // Large Kindles
     cardHeight = "550px";
-    controlHeight = "240px";
-    intervalTop = "100px";
+    controlHeight = "120px"; // Reduced from 240px
+    intervalTop = "0px";
     backMinHeight = "90px";
     notesMinHeight = "30px";
   } else if (viewport.width >= 750 || viewport.height >= 1000) {
     // Medium Kindles
     cardHeight = "400px";
-    controlHeight = "200px";
-    intervalTop = "85px";
+    controlHeight = "100px"; // Reduced from 200px
+    intervalTop = "0px";
     backMinHeight = "65px";
     notesMinHeight = "25px";
   }
@@ -482,9 +482,8 @@ function displayCurrentCard(showAnswer) {
     intervalButtons.style.display = "block";
     intervalButtons.style.visibility = "visible";
   } else {
-    showAnswerBtn.style.display = "inline-block";
-    intervalButtons.style.display = "block";
-    intervalButtons.style.visibility = "hidden";
+    showAnswerBtn.style.display = "block";
+    intervalButtons.style.display = "none"; // Hide completely instead of using visibility
   }
   
   updateProgressDisplay();
@@ -852,9 +851,8 @@ function displayErrorCard(showAnswer) {
     intervalButtons.style.display = "block";
     intervalButtons.style.visibility = "visible";
   } else {
-    showAnswerBtn.style.display = "inline-block";
-    intervalButtons.style.display = "block";
-    intervalButtons.style.visibility = "hidden";
+    showAnswerBtn.style.display = "block";
+    intervalButtons.style.display = "none"; // Hide completely instead of using visibility
   }
   
   updateProgressDisplay();

@@ -106,12 +106,12 @@ h1 {
 
 #showAnswerBtn {
   padding: 12px 25px;
-  margin: 8px;
-  margin-bottom: 20px;
+  margin: 8px auto;
   font-size: 1.1em;
   cursor: pointer;
   border: 1px solid #000;
-  min-width: 40%; /* Make show answer button wider */
+  min-width: 80%; /* Make show answer button wider to match interval buttons container width */
+  display: block; /* Make it block to center it properly */
 }
 
 .correctBtn {
@@ -135,9 +135,9 @@ h1 {
 }
 
 #controlButtons {
-  height: 160px; /* Further increased from 140px to provide more vertical space */
+  height: 100px; /* Reduced height since interval buttons will be in same location as show answer */
   position: relative;
-  margin: 20px 0 30px 0; /* Increased bottom margin from 20px to 30px */
+  margin: 20px 0 20px 0; /* Reduced bottom margin */
   text-align: center;
   overflow: hidden; /* Prevent content overflow */
 }
@@ -145,20 +145,20 @@ h1 {
 #intervalButtons {
   text-align: center;
   position: absolute;
-  top: 60px; /* Moved up slightly now that incorrect button is gone */
+  top: 0; /* Positioned at top to overlay with show answer button position */
   left: 0;
   right: 0;
   width: 100%;
-  height: 90px; /* Increased height for better spacing */
+  height: auto; /* Allow natural height based on content */
 }
 
 .intervalBtn {
-  padding: 10px 15px; /* Increased padding */
-  margin: 12px 8px; /* Increased margins */
+  padding: 8px 12px; /* Slightly reduced padding */
+  margin: 0 5px; /* Reduced margins to fit all buttons better */
   font-size: 0.95em;
   cursor: pointer;
   border: 1px solid #000;
-  min-width: 70px; /* Wider buttons */
+  min-width: 60px; /* Slightly narrower buttons */
   display: inline-block;
 }
 
