@@ -276,6 +276,31 @@
   }
 }
 
+/* Extra large screens - Kindle Scribe, etc. */
+@media screen and (min-width: 1800px) {
+  .topBar {
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 10px 30px;
+  }
+  
+  .menuBar {
+    max-width: 1400px;
+  }
+  
+  .infoArea {
+    padding-right: 30px;
+  }
+  
+  .progressBar, .levelDisplay {
+    margin-left: 25px;
+  }
+  
+  #title {
+    font-size: 2em;
+  }
+}
+
 /* Improve button layout without Incorrect button */
 @media screen and (min-width: 600px) {
   #showAnswerBtn {
@@ -475,13 +500,57 @@ button:focus {
   }
   
   .progressBar, .levelDisplay {
-    font-size: 1.1em;
-    margin-left: 20px;
+    font-size: 1em;
+    margin-left: 15px;
+  }
+  
+  .infoArea {
+    padding-right: 25px;
   }
   
   #levelButtons button, #toolButtons button {
     margin: 4px;
     padding: 7px 10px;
     font-size: 1.1em;
+  }
+}
+
+/* Popup and toast notification responsive styles */
+@media screen and (max-width: 600px) {
+  .popup {
+    width: 220px;
+    margin-left: -110px;
+    padding: 15px;
+  }
+  
+  .toast-notification {
+    width: 200px;
+    margin-left: -100px;
+  }
+}
+
+@media screen and (min-width: 750px) {
+  .popup {
+    width: 260px;
+    margin-left: -130px;
+  }
+  
+  .toast-notification {
+    width: 260px;
+    margin-left: -130px;
+  }
+}
+
+@media screen and (min-width: 1050px) {
+  .popup {
+    width: 300px;
+    margin-left: -150px;
+    padding: 25px;
+  }
+  
+  .toast-notification {
+    width: 300px;
+    margin-left: -150px;
+    padding: 15px 0;
   }
 }

@@ -153,6 +153,24 @@ function handleViewportChange() {
     log("Viewport changed, reinitializing fixed heights...");
     initializeFixedHeights();
     displayCurrentCard(false);
+    // Update text display for responsive layout
+    updateProgressDisplay();
+    updateLevelDisplay();
+    
+    // Reposition any visible popups or toasts
+    var toast = document.getElementById("toastNotification");
+    if (toast && toast.style.display === "block") {
+      var screenHeight = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+      toast.style.top = (screenHeight > 1000) ? "120px" : "80px";
+    }
+    
+    var overlay = document.getElementById("confirmationOverlay");
+    if (overlay && overlay.style.display === "block") {
+      var popup = overlay.querySelector(".popup");
+      var screenHeight = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+      var topPosition = Math.round(screenHeight / 2 - 100);
+      popup.style.top = topPosition + "px";
+    }
   }, 250);
 }
 
@@ -273,12 +291,18 @@ function updateStatusMessage(message) {
 // Show confirmation popup
 function showConfirmation(message, onConfirm) {
   var overlay = document.getElementById("confirmationOverlay");
+  var popup = overlay.querySelector(".popup");
   var messageElement = document.getElementById("confirmationMessage");
   var yesButton = document.getElementById("confirmYesBtn");
   var noButton = document.getElementById("confirmNoBtn");
   
   // Set message
   messageElement.textContent = message;
+  
+  // Adjust popup position for different screen sizes
+  var screenHeight = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+  var topPosition = Math.round(screenHeight / 2 - 100);  // Center vertically
+  popup.style.top = topPosition + "px";
   
   // Set button handlers
   yesButton.onclick = function() {
@@ -506,7 +530,7 @@ function updateProgressDisplay() {
     return;
   }
   
-  progressElement.textContent = "📝 " + (currentCardIndex % dueCards.length + 1) + 
+  progressElement.textContent = "Card :  " + (currentCardIndex % dueCards.length + 1) + 
       "/" + dueCards.length + " • ✓" + correctAnswers + 
       " • ✗" + incorrectAnswers;
   
@@ -729,6 +753,10 @@ function showToast(message, duration) {
   if (!toast) return;
   
   toast.textContent = message;
+  
+  // Adjust toast position for larger screens
+  var screenHeight = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+  toast.style.top = (screenHeight > 1000) ? "120px" : "80px";
   
   toast.style.display = "block";
   
