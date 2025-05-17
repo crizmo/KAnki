@@ -16,15 +16,27 @@
 <body onload="onPageLoad()">
   <div id="log" style="display:none;"></div>
 
-  <h1 id="title">KAnki</h1>
-  <div style="text-align: center;">
-    <div id="progressDisplay" class="progressBar"></div>
-    <div id="levelDisplay" class="levelDisplay"></div>
-  </div>
+  <header class="app-header">
+    <div class="header-title">
+      <h1>KAnki</h1>
+    </div>
+    
+    <div class="header-info">
+      <div id="progressDisplay" class="progress-display"></div>
+      <div id="levelDisplay" class="level-display"></div>
+    </div>
+  </header>
   
-  <div id="levelButtons" class="buttonContainer">
-    <button onclick="changeLevel('all')">All Levels</button>
-    <!-- Other level buttons will be added dynamically by JavaScript -->
+  <div class="toolbar">
+    <div class="toolbar-levels" id="levelToolbar">
+      <button class="level-button all-button" onclick="changeLevel('all')">All</button>
+      <!-- Level buttons will be added here dynamically -->
+    </div>
+    
+    <div class="toolbar-actions">
+      <button id="starredFilterBtn" onclick="toggleStarredFilter()">★ Starred</button>
+      <button id="reverseToggleBtn" onclick="toggleCardDirection()">↔ Flip</button>
+    </div>
   </div>
   
   <div id="mainContainer">
