@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-  <meta name="kindle-display-size" content="width=100%, height=100%, scale-to-fit=auto" />
+  <meta name="kindle-display-size" content="width=100%, height=100%, scale-to-fit=yes" />
   <meta charset="utf-8">
   <link rel="preload" href="assets/fonts/language.ttf" as="font" type="font/ttf" crossorigin="anonymous">
   <script src="js/polyfill.min.js"></script>
@@ -16,15 +16,27 @@
 <body onload="onPageLoad()">
   <div id="log" style="display:none;"></div>
 
-  <h1 id="title">KAnki</h1>
-  <div style="text-align: center;">
-    <div id="progressDisplay" class="progressBar"></div>
-    <div id="levelDisplay" class="levelDisplay"></div>
-  </div>
-  
-  <div id="levelButtons" class="buttonContainer">
-    <button onclick="changeLevel('all')">All Levels</button>
-    <!-- Other level buttons will be added dynamically by JavaScript -->
+  <div id="headerBar">
+    <div class="topBar">
+      <div class="logoArea">
+        <h1 id="title">KAnki</h1>
+      </div>
+      <div class="infoArea">
+        <div id="progressDisplay" class="progressBar"></div>
+        <div id="levelDisplay" class="levelDisplay"></div>
+      </div>
+    </div>
+    <div class="menuBar">
+      <div id="levelButtons" class="menuSection">
+        <button onclick="changeLevel('all')">All Levels</button>
+        <!-- Other level buttons will be added dynamically by JavaScript -->
+      </div>
+      <div class="menuDivider"></div>
+      <div id="toolButtons" class="menuSection">
+        <button id="starredFilterBtn" onclick="toggleStarredFilter()">★ Star</button>
+        <button id="reverseToggleBtn" onclick="toggleCardDirection()">↔ Flip</button>
+      </div>
+    </div>
   </div>
   
   <div id="mainContainer">
@@ -44,7 +56,7 @@
     
     <div id="controlButtons" class="buttonContainer">
       <button id="showAnswerBtn" onclick="showAnswer()">Show Answer</button>
-      <div id="intervalButtons" style="display: none; visibility: hidden;">
+      <div id="intervalButtons" style="display: none;">
         <button class="intervalBtn againBtn" onclick="handleAnswerWithInterval('again')">Again<br>&lt;10m</button>
         <button class="intervalBtn hardBtn" onclick="handleAnswerWithInterval('hard')">Hard<br>1d</button>
         <button class="intervalBtn goodBtn" onclick="handleAnswerWithInterval('good')">Good<br>3d</button>
@@ -55,7 +67,7 @@
     <div class="buttonContainer">
       <button onclick="showResetProgressConfirm()">Reset Progress</button>
       <button onclick="showResetAllConfirm()">Reset All Data</button>
-      <button onclick="window.location.reload();">Update</button>
+      <button id="updateBtn" onclick="window.location.reload();">↻ Update</button>
     </div>
   </div>
   

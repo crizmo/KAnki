@@ -9,6 +9,7 @@ var incorrectCardsQueue = [];
 var inErrorReviewMode = false;
 var showingStarredOnly = false; 
 var isReversedMode = false; 
+var deviceScaleFactor = 1.0; // New variable for device scaling
 
 // Initialize configuration from vocabulary.js if available
 function initializeConfig() {
@@ -56,8 +57,8 @@ function initializeFixedHeights() {
   
   // Set dimensions based on screen size
   var cardHeight = "300px";
-  var controlHeight = "160px"; 
-  var intervalTop = "70px";
+  var controlHeight = "100px"; // Reduced control height
+  var intervalTop = "0px"; // Interval buttons appear at the top of the control section now
   var backMinHeight = "50px";
   var notesMinHeight = "20px";
   
@@ -65,22 +66,22 @@ function initializeFixedHeights() {
   if (viewport.width >= 1800 || viewport.height >= 2400) {
     // Kindle Scribe
     cardHeight = "700px";
-    controlHeight = "320px";
-    intervalTop = "130px";
+    controlHeight = "160px"; // Reduced from 320px
+    intervalTop = "0px";
     backMinHeight = "120px";
     notesMinHeight = "40px";
   } else if (viewport.width >= 1050 || viewport.height >= 1400) {
     // Large Kindles
     cardHeight = "550px";
-    controlHeight = "240px";
-    intervalTop = "100px";
+    controlHeight = "120px"; // Reduced from 240px
+    intervalTop = "0px";
     backMinHeight = "90px";
     notesMinHeight = "30px";
   } else if (viewport.width >= 750 || viewport.height >= 1000) {
     // Medium Kindles
     cardHeight = "400px";
-    controlHeight = "200px";
-    intervalTop = "85px";
+    controlHeight = "100px"; // Reduced from 200px
+    intervalTop = "0px";
     backMinHeight = "65px";
     notesMinHeight = "25px";
   }
@@ -150,9 +151,29 @@ function handleViewportChange() {
   }
   
   window.resizeTimer = setTimeout(function() {
-    log("Viewport changed, reinitializing fixed heights...");
+    log("Viewport changed, reinitializing and applying device scaling...");
+    // Apply device-specific scaling first
+    detectDeviceAndSetScaling();
     initializeFixedHeights();
     displayCurrentCard(false);
+    // Update text display for responsive layout
+    updateProgressDisplay();
+    updateLevelDisplay();
+    
+    // Reposition any visible popups or toasts
+    var toast = document.getElementById("toastNotification");
+    if (toast && toast.style.display === "block") {
+      var screenHeight = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+      toast.style.top = (screenHeight > 1000) ? "120px" : "80px";
+    }
+    
+    var overlay = document.getElementById("confirmationOverlay");
+    if (overlay && overlay.style.display === "block") {
+      var popup = overlay.querySelector(".popup");
+      var screenHeight = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+      var topPosition = Math.round(screenHeight / 2 - 100);
+      popup.style.top = topPosition + "px";
+    }
   }, 250);
 }
 
@@ -273,12 +294,18 @@ function updateStatusMessage(message) {
 // Show confirmation popup
 function showConfirmation(message, onConfirm) {
   var overlay = document.getElementById("confirmationOverlay");
+  var popup = overlay.querySelector(".popup");
   var messageElement = document.getElementById("confirmationMessage");
   var yesButton = document.getElementById("confirmYesBtn");
   var noButton = document.getElementById("confirmNoBtn");
   
   // Set message
   messageElement.textContent = message;
+  
+  // Adjust popup position for different screen sizes
+  var screenHeight = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+  var topPosition = Math.round(screenHeight / 2 - 100);  // Center vertically
+  popup.style.top = topPosition + "px";
   
   // Set button handlers
   yesButton.onclick = function() {
@@ -482,9 +509,8 @@ function displayCurrentCard(showAnswer) {
     intervalButtons.style.display = "block";
     intervalButtons.style.visibility = "visible";
   } else {
-    showAnswerBtn.style.display = "inline-block";
-    intervalButtons.style.display = "block";
-    intervalButtons.style.visibility = "hidden";
+    showAnswerBtn.style.display = "block";
+    intervalButtons.style.display = "none"; // Hide completely instead of using visibility
   }
   
   updateProgressDisplay();
@@ -494,22 +520,22 @@ function updateProgressDisplay() {
   var progressElement = document.getElementById("progressDisplay");
   
   if (inErrorReviewMode) {
-    progressElement.textContent = "Error Review: Card " + (currentCardIndex + 1) + 
-      " of " + incorrectCardsQueue.length + " • Correct: " + correctAnswers + 
-      " • Incorrect: " + incorrectAnswers;
+    progressElement.textContent = "⚠️ " + (currentCardIndex + 1) + 
+      "/" + incorrectCardsQueue.length + " • ✓" + correctAnswers + 
+      " • ✗" + incorrectAnswers;
     return;
   }
   
   var dueCards = getDueCards();
   
   if (dueCards.length === 0) {
-    progressElement.textContent = "All caught up! No cards to review.";
+    progressElement.textContent = "✓ Done!";
     return;
   }
   
-  progressElement.textContent = "Card " + (currentCardIndex % dueCards.length + 1) + 
-      " of " + dueCards.length + " • Correct: " + correctAnswers + 
-      " • Incorrect: " + incorrectAnswers;
+  progressElement.textContent = "Card :  " + (currentCardIndex % dueCards.length + 1) + 
+      "/" + dueCards.length + " • ✓" + correctAnswers + 
+      " • ✗" + incorrectAnswers;
   
 
   updateLevelDisplay();
@@ -518,13 +544,13 @@ function updateProgressDisplay() {
 
 function updateLevelDisplay() {
   var levelDisplayElement = document.getElementById("levelDisplay");
-  var displayText = "Level: " + (currentLevel === "all" ? "All Levels" : currentLevel);
+  var displayText = (currentLevel === "all" ? "All" : currentLevel);
 
   if (showingStarredOnly) {
-    displayText += " (Starred Only)";
+    displayText += " ★";
   }
  
-  displayText += " • " + (isReversedMode ? "Native → Target" : "Target → Native");
+  displayText += " • " + (isReversedMode ? "Native→Target" : "Target→Native");
   
   levelDisplayElement.textContent = displayText;
 }
@@ -656,6 +682,9 @@ function onPageLoad() {
   log("Application initializing...");
 
   initializeConfig();
+  
+  // Apply device-specific scaling before anything else
+  detectDeviceAndSetScaling();
 
   loadLanguageFont();
 
@@ -670,6 +699,18 @@ function onPageLoad() {
   if (!loadDeck()) {
     deck = createDefaultDeck();
     log("Created new default deck");
+  }
+  
+  // Update menu button states
+  var starredFilterBtn = document.getElementById("starredFilterBtn");
+  var reverseToggleBtn = document.getElementById("reverseToggleBtn");
+  
+  if (starredFilterBtn && showingStarredOnly) {
+    starredFilterBtn.classList.add("active");
+  }
+  
+  if (reverseToggleBtn && isReversedMode) {
+    reverseToggleBtn.classList.add("active");
   }
 
   updateProgressDisplay();
@@ -696,19 +737,7 @@ function updateLevelButtons() {
   var lineBreak = document.createElement("br");
   levelsContainer.appendChild(lineBreak);
   
-  var starredFilterBtn = document.createElement("button");
-  starredFilterBtn.id = "starredFilterBtn";
-  starredFilterBtn.textContent = "★ Starred";
-  starredFilterBtn.onclick = toggleStarredFilter;
-  starredFilterBtn.style.marginTop = "10px"; 
-  levelsContainer.appendChild(starredFilterBtn);
-  
-  var reverseToggleBtn = document.createElement("button");
-  reverseToggleBtn.id = "reverseToggleBtn";
-  reverseToggleBtn.textContent = "↔ Reverse";
-  reverseToggleBtn.onclick = toggleCardDirection;
-  reverseToggleBtn.style.marginTop = "10px"; 
-  levelsContainer.appendChild(reverseToggleBtn);
+  // These buttons are now in the HTML directly
 }
 
 function createLevelChangeHandler(level) {
@@ -730,6 +759,10 @@ function showToast(message, duration) {
   if (!toast) return;
   
   toast.textContent = message;
+  
+  // Adjust toast position for larger screens
+  var screenHeight = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+  toast.style.top = (screenHeight > 1000) ? "120px" : "80px";
   
   toast.style.display = "block";
   
@@ -852,9 +885,8 @@ function displayErrorCard(showAnswer) {
     intervalButtons.style.display = "block";
     intervalButtons.style.visibility = "visible";
   } else {
-    showAnswerBtn.style.display = "inline-block";
-    intervalButtons.style.display = "block";
-    intervalButtons.style.visibility = "hidden";
+    showAnswerBtn.style.display = "block";
+    intervalButtons.style.display = "none"; // Hide completely instead of using visibility
   }
   
   updateProgressDisplay();
@@ -977,7 +1009,7 @@ function toggleCardDirection() {
   // Save user preference for card direction
   saveDeck();
   
-  showToast(isReversedMode ? "Reversed Mode: Native → Target" : "Normal Mode: Target → Native", 2000);
+  showToast(isReversedMode ? "Flip: Native → Target" : "Flip: Target → Native", 1500);
 }
 
 function updateDirectionDisplay() {
@@ -1033,4 +1065,49 @@ function updateCardStats(card) {
   
   statsElement.innerHTML = "Viewed " + totalViews + " time" + (totalViews !== 1 ? "s" : "") + 
     " • Last: " + lastViewedText;
+}
+
+// Detect device and set appropriate scaling
+function detectDeviceAndSetScaling() {
+  var width = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+  var height = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+  
+  log("Device resolution detected: " + width + "x" + height);
+  
+  // Base scale is for 600x800 (original Kindle)
+  deviceScaleFactor = 1.0;
+  
+  // Specific handling for Kindle Paperwhite 3 (1072×1448)
+  if ((width >= 1070 && width <= 1080) && (height >= 1440 && height <= 1460)) {
+    deviceScaleFactor = 0.6; // Special scaling for Paperwhite 3
+    log("Kindle Paperwhite 3 detected. Applied special scaling: " + deviceScaleFactor);
+  }
+  // High DPI Kindle devices (like Oasis, Scribe)
+  else if (width >= 1000 && height >= 1400) {
+    deviceScaleFactor = 0.65; // Reduce the scaling factor for high-res screens
+    log("High-res device detected. Applied scaling: " + deviceScaleFactor);
+  }
+  // Mid-size Kindle screens
+  else if ((width >= 750 && width < 1000) || (height >= 1000 && height < 1400)) {
+    deviceScaleFactor = 0.8;
+    log("Mid-size device detected. Applied scaling: " + deviceScaleFactor);
+  }
+  
+  // Apply scaling to the root element
+  document.documentElement.style.fontSize = (deviceScaleFactor * 100) + "%";
+  
+  // Set a CSS variable that can be used in CSS files
+  document.documentElement.style.setProperty('--device-scale', deviceScaleFactor);
+  
+  // Add a special class for specific device types
+  var body = document.body;
+  body.classList.remove('kindle-base', 'kindle-paperwhite', 'kindle-oasis');
+  
+  if ((width >= 1070 && width <= 1080) && (height >= 1440 && height <= 1460)) {
+    body.classList.add('kindle-paperwhite');
+  } else if (width >= 1200) {
+    body.classList.add('kindle-oasis');
+  } else {
+    body.classList.add('kindle-base');
+  }
 }
