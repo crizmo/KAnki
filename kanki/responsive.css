@@ -1,6 +1,46 @@
 /* KAnki - Responsive Styles for Different Kindle Models */
 
+/* Root element custom properties for dynamic scaling */
+:root {
+  --device-scale: 1;
+  --font-size-base: calc(1rem * var(--device-scale));
+  --spacing-base: calc(1rem * var(--device-scale));
+  font-size: 100%;
+}
+
 /* Base styles - already defined in main.css */
+
+/* Base size adjustments */
+body {
+  font-size: var(--font-size-base);
+}
+
+/* Card sizing adjustments with scaling */
+.card {
+  max-width: calc(90% / var(--device-scale));
+  margin-left: auto;
+  margin-right: auto;
+  padding: calc(20px * var(--device-scale));
+}
+
+/* Text size adjustments */
+.cardFront {
+  font-size: calc(2em * var(--device-scale));
+}
+
+.cardBack {
+  font-size: calc(1.6em * var(--device-scale));
+}
+
+.cardNotes {
+  font-size: calc(1em * var(--device-scale));
+}
+
+/* Button sizing adjustments */
+button {
+  font-size: calc(1em * var(--device-scale));
+  padding: calc(5px * var(--device-scale)) calc(10px * var(--device-scale));
+}
 
 /* Portrait and landscape orientation adjustments */
 @media screen and (orientation: portrait) {
@@ -83,15 +123,15 @@
 @media screen and (min-width: 1050px) and (max-width: 1300px),
        screen and (min-height: 1400px) and (max-height: 1700px) {
   h1 {
-    font-size: 2.5em;
-    margin: 30px 0;
+    font-size: 2em;
+    margin: 20px 0;
   }
 
   .card {
     height: 550px;
-    max-width: 80%;
-    margin: 35px auto;
-    padding: 35px;
+    max-width: 85%;
+    margin: 25px auto;
+    padding: 25px;
   }
 
   .cardFront {
@@ -553,4 +593,95 @@ button:focus {
     margin-left: -150px;
     padding: 15px 0;
   }
+}
+
+/* Layout adjustments for high-DPI screens */
+@media screen and (min-width: 1000px), screen and (min-height: 1400px) {
+  /* Paperwhite and higher resolution specific tweaks */
+  .menuBar {
+    padding: calc(5px * var(--device-scale)) 0;
+  }
+  
+  #levelButtons button {
+    margin: calc(2px * var(--device-scale));
+    font-size: calc(0.85em * var(--device-scale));
+  }
+  
+  /* Prevent elements from being too large on high-res screens */
+  #headerBar {
+    margin-bottom: calc(10px * var(--device-scale));
+  }
+  
+  .topBar {
+    padding: calc(5px * var(--device-scale));
+  }
+  
+  #title {
+    font-size: calc(1.4em * var(--device-scale));
+  }
+  
+  .menuSection button {
+    margin: calc(2px * var(--device-scale));
+  }
+  
+  #controlButtons {
+    margin-top: calc(20px * var(--device-scale));
+  }
+
+  #intervalButtons {
+    margin-top: calc(15px * var(--device-scale));
+  }
+  
+  .intervalBtn {
+    margin: calc(5px * var(--device-scale));
+  }
+}
+
+/* Specific fixes for Kindle Paperwhite 3 (1072×1448) */
+.kindle-paperwhite {
+  /* Reduce spacing to prevent cramping */
+  --device-scale: 0.6;
+}
+
+.kindle-paperwhite #headerBar {
+  margin-bottom: 10px;
+}
+
+.kindle-paperwhite .menuBar {
+  padding: 3px 0;
+}
+
+.kindle-paperwhite #levelButtons button {
+  padding: 4px 8px;
+  margin: 0 1px;
+  font-size: 0.8em;
+}
+
+.kindle-paperwhite .card {
+  max-width: 85%;
+  padding: 20px;
+  margin: 15px auto;
+}
+
+.kindle-paperwhite .cardFront {
+  font-size: 1.8em;
+  margin-bottom: 20px;
+}
+
+.kindle-paperwhite .cardBack {
+  font-size: 1.5em;
+  margin-bottom: 15px;
+}
+
+.kindle-paperwhite #showAnswerBtn, 
+.kindle-paperwhite #incorrectBtn, 
+.kindle-paperwhite #correctBtn {
+  padding: 8px 16px;
+  font-size: 1em;
+}
+
+.kindle-paperwhite .intervalBtn {
+  padding: 6px 10px;
+  font-size: 0.9em;
+  margin: 5px;
 }

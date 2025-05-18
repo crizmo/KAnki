@@ -9,6 +9,7 @@ var incorrectCardsQueue = [];
 var inErrorReviewMode = false;
 var showingStarredOnly = false; 
 var isReversedMode = false; 
+var deviceScaleFactor = 1.0; // New variable for device scaling
 
 // Initialize configuration from vocabulary.js if available
 function initializeConfig() {
@@ -150,7 +151,9 @@ function handleViewportChange() {
   }
   
   window.resizeTimer = setTimeout(function() {
-    log("Viewport changed, reinitializing fixed heights...");
+    log("Viewport changed, reinitializing and applying device scaling...");
+    // Apply device-specific scaling first
+    detectDeviceAndSetScaling();
     initializeFixedHeights();
     displayCurrentCard(false);
     // Update text display for responsive layout
@@ -679,6 +682,9 @@ function onPageLoad() {
   log("Application initializing...");
 
   initializeConfig();
+  
+  // Apply device-specific scaling before anything else
+  detectDeviceAndSetScaling();
 
   loadLanguageFont();
 
@@ -1059,4 +1065,49 @@ function updateCardStats(card) {
   
   statsElement.innerHTML = "Viewed " + totalViews + " time" + (totalViews !== 1 ? "s" : "") + 
     " • Last: " + lastViewedText;
+}
+
+// Detect device and set appropriate scaling
+function detectDeviceAndSetScaling() {
+  var width = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+  var height = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+  
+  log("Device resolution detected: " + width + "x" + height);
+  
+  // Base scale is for 600x800 (original Kindle)
+  deviceScaleFactor = 1.0;
+  
+  // Specific handling for Kindle Paperwhite 3 (1072×1448)
+  if ((width >= 1070 && width <= 1080) && (height >= 1440 && height <= 1460)) {
+    deviceScaleFactor = 0.6; // Special scaling for Paperwhite 3
+    log("Kindle Paperwhite 3 detected. Applied special scaling: " + deviceScaleFactor);
+  }
+  // High DPI Kindle devices (like Oasis, Scribe)
+  else if (width >= 1000 && height >= 1400) {
+    deviceScaleFactor = 0.65; // Reduce the scaling factor for high-res screens
+    log("High-res device detected. Applied scaling: " + deviceScaleFactor);
+  }
+  // Mid-size Kindle screens
+  else if ((width >= 750 && width < 1000) || (height >= 1000 && height < 1400)) {
+    deviceScaleFactor = 0.8;
+    log("Mid-size device detected. Applied scaling: " + deviceScaleFactor);
+  }
+  
+  // Apply scaling to the root element
+  document.documentElement.style.fontSize = (deviceScaleFactor * 100) + "%";
+  
+  // Set a CSS variable that can be used in CSS files
+  document.documentElement.style.setProperty('--device-scale', deviceScaleFactor);
+  
+  // Add a special class for specific device types
+  var body = document.body;
+  body.classList.remove('kindle-base', 'kindle-paperwhite', 'kindle-oasis');
+  
+  if ((width >= 1070 && width <= 1080) && (height >= 1440 && height <= 1460)) {
+    body.classList.add('kindle-paperwhite');
+  } else if (width >= 1200) {
+    body.classList.add('kindle-oasis');
+  } else {
+    body.classList.add('kindle-base');
+  }
 }
