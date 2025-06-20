@@ -59,7 +59,7 @@ KAnki is a spaced repetition flashcard application designed specifically for jai
 6. Copy your `language.ttf` font file to the new `kanki/assets/fonts/language.ttf` location
 7. Disconnect your Kindle from the computer
 8. Open the Kindle's home screen and run the KAnki app
-9. Hit the `Update` button in the app to apply changes
+9. Hit the `Reload` button after clicking the 3 dots in the top chromebar in the app to apply changes.
 10. Done! Your KAnki app is now updated with the latest features including the new star/favorite functionality
 
 **Note for users updating to the starred cards version**: When updating from a previous version without the star functionality, all your existing cards will initially be unstarred. You'll need to manually star your important cards after updating.
