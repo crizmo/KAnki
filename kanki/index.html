@@ -1,7 +1,8 @@
 <!DOCTYPE HTML>
 <html>
+
 <head>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <meta name="kindle-display-size" content="width=100%, height=100%, scale-to-fit=yes" />
   <meta charset="utf-8">
   <link rel="preload" href="assets/fonts/language.ttf" as="font" type="font/ttf" crossorigin="anonymous">
@@ -12,7 +13,60 @@
   <link href="main.css" rel="stylesheet">
   <link href="responsive.css" rel="stylesheet">
   <title>KAnki</title>
+  <script>
+    function update() {
+      var chromebar = {
+        "appId": "xyz.kurizu.kanki",
+        "topNavBar": {
+          "template": "title",
+          "title": "KAnki",
+          "buttons": [
+            {
+              "id": "KPP_MORE",
+              "state": "enabled",
+              "handling": "system"
+            },
+            {
+              "id": "KPP_CLOSE",
+              "state": "enabled",
+              "handling": "system"
+            }
+          ],
+        },
+        "systemMenu": {
+          "clientParams": {
+            "profile": {
+              "name": "default",
+              "items": [
+                {
+                  "id": "KANKI_RELOAD",
+                  "state": "enabled",
+                  "handling": "notifyApp",
+                  "label": "Reload",
+                  "position": 0
+                }
+              ],
+              "selectionMode": "none",
+              "closeOnUse": true
+            }
+          }
+        }
+      };
+      window.kindle.messaging.sendMessage("com.lab126.chromebar", "configureChrome", chromebar);
+    };
+
+    window.kindle.appmgr.ongo = function (ctx) {
+      update();
+      window.kindle.messaging.receiveMessage("systemMenuItemSelected", function (type, id) {
+        switch (id) {
+          case "KANKI_RELOAD":
+            window.location.reload();
+        };
+      });
+    };
+  </script>
 </head>
+
 <body onload="onPageLoad()">
   <div id="log" style="display:none;"></div>
 
@@ -38,10 +92,10 @@
       </div>
     </div>
   </div>
-  
+
   <div id="mainContainer">
     <div id="statusMessage" style="display: none;"></div>
-    
+
     <!-- Fixed card structure to prevent DOM rebuilding -->
     <div id="cardContainer" class="card">
       <div id="levelBadge" class="levelBadge"></div>
@@ -53,7 +107,7 @@
       <!-- Card statistics section -->
       <div id="cardStats" class="cardStats"></div>
     </div>
-    
+
     <div id="controlButtons" class="buttonContainer">
       <button id="showAnswerBtn" onclick="showAnswer()">Show Answer</button>
       <div id="intervalButtons" style="display: none;">
@@ -63,14 +117,13 @@
         <button class="intervalBtn easyBtn" onclick="handleAnswerWithInterval('easy')">Easy<br>7d</button>
       </div>
     </div>
-    
+
     <div class="buttonContainer">
       <button onclick="showResetProgressConfirm()">Reset Progress</button>
       <button onclick="showResetAllConfirm()">Reset All Data</button>
-      <button id="updateBtn" onclick="window.location.reload();">↻ Update</button>
     </div>
   </div>
-  
+
   <!-- Confirmation popup overlay (hidden by default) -->
   <div id="confirmationOverlay" class="overlay" style="display: none;">
     <div class="popup">
@@ -81,12 +134,13 @@
       </div>
     </div>
   </div>
-  
+
   <!-- Toast notification (hidden by default) -->
   <div id="toastNotification" class="toast-notification" style="display: none;"></div>
-  
+
   <div class="footer">
     <p>v1.1.0</p>
   </div>
 </body>
+
 </html>
