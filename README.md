@@ -112,6 +112,13 @@ For languages with different writing systems, use the `reading` property:
 {"front": "こんにちは", "reading": "konnichiwa", "back": "Hello", "notes": "Greeting"}
 ```
 
+## Converting to Anki Format
+
+If you want to convert your KAnki configuration to Anki's `.apkg` format for the desktop/mobile Anki application, you can use the **KankiToAnki** converter:
+
+- **GitHub Repository**: https://github.com/crizmo/KankiToAnki
+- **Web App**: https://kankitoanki.vercel.app/
+
 ## Data Storage
 
 KAnki saves your progress and card statistics using the Kindle's localStorage feature. All your data is stored locally on your device at:
