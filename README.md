@@ -112,6 +112,18 @@ For languages with different writing systems, use the `reading` property:
 {"front": "こんにちは", "reading": "konnichiwa", "back": "Hello", "notes": "Greeting"}
 ```
 
+## Web Editor for Flashcards by Kindlemodshelfguy
+
+For an easy way to manage your flashcards visually, you can use the **KAnki Web Editor**:
+
+- **Web Editor**: https://kindlemodshelf.me/editor.html
+
+This online editor allows you to:
+- Upload your existing flashcard configuration files
+- Add, edit, and delete cards and decks through a user-friendly interface
+- Preview how your flashcards will look on different Kindle generations
+- Export your modified configuration back to your Kindle
+
 ## Converting to Anki Format
 
 If you want to convert your KAnki configuration to Anki's `.apkg` format for the desktop/mobile Anki application, you can use the **KankiToAnki** converter:
