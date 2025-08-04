@@ -112,7 +112,7 @@ For languages with different writing systems, use the `reading` property:
 {"front": "こんにちは", "reading": "konnichiwa", "back": "Hello", "notes": "Greeting"}
 ```
 
-## Web Editor for Flashcards by Kindlemodshelfguy
+## Web Editor for Flashcards by [Kindlemodshelfguy](https://github.com/NemesisHubris)
 
 For an easy way to manage your flashcards visually, you can use the **KAnki Web Editor**:
 
