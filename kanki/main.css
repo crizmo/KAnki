@@ -143,8 +143,17 @@ h1 {
   max-width: 80%;
   position: relative;
   height: 300px; /* Fixed height instead of min-height */
-  overflow: hidden; /* Prevent content overflow */
-  border: 1px solid #000000; /* Added border */
+  overflow-y: auto; /* Allow vertical scrolling for content */
+  overflow-x: hidden; /* Prevent horizontal overflow */
+  border: 1px solid #000000;
+  /* Ensure text wrapping for all content */
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
+  /* Enhanced scrolling for better user experience */
+  scroll-behavior: smooth; /* Smooth scrolling when navigating */
+  scrollbar-width: thin; /* Thinner scrollbar for better aesthetics */
+  scrollbar-color: #888 #f1f1f1; /* Custom scrollbar colors */
 }
 
 .levelBadge {
@@ -165,20 +174,28 @@ h1 {
   margin-top: 15px;
   font-family: 'LanguageFont', sans-serif;
   min-height: 60px; /* Fixed minimum height */
+  word-wrap: break-word; /* Break long words */
+  overflow-wrap: break-word; /* Modern alternative to word-wrap */
+  hyphens: auto; /* Add hyphenation for better text wrapping */
 }
 
 .cardBack {
   font-size: 1.5em;
   margin-bottom: 10px;
   padding-top: 15px;
-  border-top: 1px solid #eee;
   min-height: 50px; /* Fixed minimum height */
+  word-wrap: break-word; /* Break long words */
+  overflow-wrap: break-word; /* Modern alternative to word-wrap */
+  hyphens: auto; /* Add hyphenation for better text wrapping */
 }
 
 .cardNotes {
   font-size: 0.9em;
   color: #666;
   font-style: italic;
+  word-wrap: break-word; /* Break long words */
+  overflow-wrap: break-word; /* Modern alternative to word-wrap */
+  hyphens: auto; /* Add hyphenation for better text wrapping */
 }
 
 /* Card statistics styling */
@@ -188,8 +205,92 @@ h1 {
   text-align: right;
   margin-top: 15px;
   padding-top: 5px;
-  border-top: 1px dashed #eee;
+  position: relative;
   font-style: italic;
+}
+
+/* Add a subtle dashed separator that fades at the edges */
+.cardStats::before {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 20%;
+  right: 0;
+  height: 1px;
+  background-image: linear-gradient(to right, transparent, rgba(238,238,238,0.8) 10%, transparent 10%, rgba(238,238,238,0.8) 20%, transparent 20%);
+  background-size: 8px 1px;
+  background-repeat: repeat-x;
+}
+
+/* Custom scrollbar styling for better visibility */
+.card::-webkit-scrollbar {
+  width: 8px;
+}
+
+.card::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.card::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 10px;
+}
+
+.card::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* Scroll indicators - subtle visual cues for scrollable content */
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0) 100%);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+  z-index: 2;
+  display: none; /* Hidden by default */
+}
+
+.card::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+  z-index: 2;
+  display: none; /* Hidden by default */
+}
+
+/* Show scroll indicators when content is scrollable AND scrolled */
+.card.scrollable-top::before {
+  display: block;
+  opacity: 1;
+}
+
+.card.scrollable-bottom::after {
+  display: block;
+  opacity: 1;
+}
+
+/* Enhanced focus states for better keyboard navigation visibility */
+.card:focus {
+  outline: 2px solid #4285f4;
+  outline-offset: 2px;
+}
+
+/* Add a subtle animation when scrolling programmatically */
+.card.smooth-scroll {
+  scroll-behavior: smooth;
 }
 
 #showAnswerBtn {
@@ -220,6 +321,10 @@ h1 {
   margin: 15px auto;
   max-width: 80%;
   text-align: center;
+  word-wrap: break-word; /* Break long words */
+  overflow-wrap: break-word; /* Modern alternative to word-wrap */
+  hyphens: auto; /* Add hyphenation for better text wrapping */
+  font-size: 1.2em; /* Make status messages appropriately sized */
 }
 
 #controlButtons {
@@ -227,7 +332,7 @@ h1 {
   position: relative;
   margin: 20px 0 20px 0; /* Reduced bottom margin */
   text-align: center;
-  overflow: hidden; /* Prevent content overflow */
+  overflow: visible; /* Allow content to be visible instead of hidden */
 }
 
 #intervalButtons {
@@ -280,8 +385,7 @@ h1 {
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: #000000;
-  opacity: 0.7;
+  background-color: rgba(0, 0, 0, 0.8);
   z-index: 100;
 }
 
@@ -292,13 +396,15 @@ h1 {
   /* Using negative margins to center for better compatibility */
   margin-top: -100px; 
   margin-left: -140px;
-  background-color: white;
+  background-color: #ffffff;
+  color: #000000;
   padding: 20px;
   border-radius: 5px;
   border: 2px solid #333;
   width: 240px;
   z-index: 101;
   text-align: center;
+  opacity: 1;
 }
 
 .popup-message {
@@ -306,6 +412,7 @@ h1 {
   font-size: 1.1em;
   line-height: 1.4;
   word-wrap: break-word;
+  color: #000000;
 }
 
 .popup-buttons {
@@ -319,18 +426,20 @@ h1 {
   width: 80px;
   margin: 0 10px;
   padding: 8px 0;
+  color: #ffffff;
+  border: 1px solid #000;
 }
 
 .confirmBtn {
-  background-color: #666666; 
-  color: white;
+  background-color: #333333; 
+  color: #ffffff;
   border: 1px solid #000;
   padding: 8px 15px;
 }
 
 .cancelBtn {
-  background-color: #222222;
-  color: white;
+  background-color: #666666;
+  color: #ffffff;
   border: 1px solid #000;
   padding: 8px 15px;
 }

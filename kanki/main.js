@@ -10,6 +10,9 @@ var inErrorReviewMode = false;
 var showingStarredOnly = false; 
 var isReversedMode = false; 
 var deviceScaleFactor = 1.0; // New variable for device scaling
+var lastShowAnswerTime = 0; // Timestamp to prevent accidental button presses after showing answer
+var starredCardsQueue = []; // Queue for starred cards review
+var inStarredReviewMode = false; // Flag for starred review mode
 
 // Initialize configuration from vocabulary.js if available
 function initializeConfig() {
@@ -88,12 +91,13 @@ function initializeFixedHeights() {
   
   if (cardContainer) {
     cardContainer.style.height = cardHeight; 
-    cardContainer.style.overflow = "hidden";
+    cardContainer.style.overflowY = "auto";
+    cardContainer.style.overflowX = "hidden";
   }
   
   if (controlButtons) {
     controlButtons.style.height = controlHeight; 
-    controlButtons.style.overflow = "hidden";
+    controlButtons.style.overflow = "visible";
   }
   
   if (intervalButtons) {
@@ -397,7 +401,7 @@ function setNextReviewTime(card, difficulty) {
       card.difficulty += 1; // Increase difficulty
       break;
     case 'easy':
-      interval = 7 * 24 * 60 * 60 * 1000; // 7 days
+      interval = 4 * 24 * 60 * 60 * 1000; // 4 days
       card.difficulty += 2; // Increase difficulty more
       break;
     default:
@@ -436,6 +440,24 @@ function getDueCards() {
   return dueCards;
 }
 
+// Get starred cards that have been reviewed in the current session
+function getStarredCardsFromCurrentSession() {
+  var starredCards = [];
+  
+  for (var i = 0; i < deck.cards.length; i++) {
+    var card = deck.cards[i];
+    if (card.starred === true && card.timesViewed > 0) {
+      // Apply level filter to starred cards too
+      var levelMatch = (currentLevel === "all" || card.level === currentLevel);
+      if (levelMatch) {
+        starredCards.push(card);
+      }
+    }
+  }
+  
+  return starredCards;
+}
+
 // Display current card - optimized to update DOM elements instead of recreating them
 function displayCurrentCard(showAnswer) {
   var dueCards = getDueCards();
@@ -456,7 +478,7 @@ function displayCurrentCard(showAnswer) {
   
   if (dueCards.length === 0) {
     cardContainer.style.display = "block";
-    frontElement.innerHTML = "<p>No cards due for review!</p><p>Great job!</p>";
+    frontElement.innerHTML = "<div style='font-size: 0.7em; font-weight: normal; text-align: center; padding: 20px;'><p>No cards due for review!</p><p>Great job! </p></div>";
     levelBadge.style.display = "none";
     showAnswerBtn.style.display = "none";
 
@@ -467,6 +489,8 @@ function displayCurrentCard(showAnswer) {
   
     if (incorrectCardsQueue.length > 0) {
       showErrorReviewPrompt();
+    } else if (getStarredCardsFromCurrentSession().length > 0 && !inStarredReviewMode) {
+      showStarredReviewPrompt();
     }
     
     updateProgressDisplay();
@@ -502,12 +526,17 @@ function displayCurrentCard(showAnswer) {
   
   updateCardStats(card);
   
+  // Check if card content is scrollable and update visual indicators
+  updateScrollIndicators();
+  
   if (showAnswer) {
     backElement.style.display = "block";
     notesElement.style.display = "block";
     showAnswerBtn.style.display = "none";
     intervalButtons.style.display = "block";
     intervalButtons.style.visibility = "visible";
+    // Update scroll indicators after showing answer (content height may change)
+    setTimeout(updateScrollIndicators, 100);
   } else {
     showAnswerBtn.style.display = "block";
     intervalButtons.style.display = "none"; // Hide completely instead of using visibility
@@ -523,6 +552,12 @@ function updateProgressDisplay() {
     progressElement.textContent = "⚠️ " + (currentCardIndex + 1) + 
       "/" + incorrectCardsQueue.length + " • ✓" + correctAnswers + 
       " • ✗" + incorrectAnswers;
+    return;
+  }
+  
+  if (inStarredReviewMode) {
+    progressElement.textContent = "★ " + (currentCardIndex + 1) + 
+      "/" + starredCardsQueue.length + " starred cards";
     return;
   }
   
@@ -555,10 +590,137 @@ function updateLevelDisplay() {
   levelDisplayElement.textContent = displayText;
 }
 
+// Function to check if card content is scrollable and update visual indicators
+function updateScrollIndicators() {
+  var cardContainer = document.getElementById("cardContainer");
+  if (!cardContainer) return;
+  
+  // Small delay to ensure DOM is fully rendered
+  setTimeout(function() {
+    // Check if content is actually scrollable
+    var hasScrollableContent = cardContainer.scrollHeight > cardContainer.clientHeight;
+    
+    if (!hasScrollableContent) {
+      // No scrollable content - hide all indicators
+      cardContainer.classList.remove("scrollable-top");
+      cardContainer.classList.remove("scrollable-bottom");
+      return;
+    }
+    
+    // Content is scrollable - check current scroll position
+    var isScrollableTop = cardContainer.scrollTop > 5; // Small threshold to avoid flickering
+    var isScrollableBottom = cardContainer.scrollTop < (cardContainer.scrollHeight - cardContainer.clientHeight - 5);
+    
+    // Add or remove classes based on scroll position
+    if (isScrollableTop) {
+      cardContainer.classList.add("scrollable-top");
+    } else {
+      cardContainer.classList.remove("scrollable-top");
+    }
+    
+    if (isScrollableBottom && hasScrollableContent) {
+      cardContainer.classList.add("scrollable-bottom");
+    } else {
+      cardContainer.classList.remove("scrollable-bottom");
+    }
+    
+    // Remove any existing scroll listener to avoid duplicates
+    cardContainer.removeEventListener('scroll', scrollHandler);
+    
+    // Add scroll event listener to update indicators dynamically
+    cardContainer.addEventListener('scroll', scrollHandler);
+  }, 50);
+}
+
+// Separate scroll handler function to avoid creating multiple listeners
+function scrollHandler() {
+  var cardContainer = document.getElementById("cardContainer");
+  if (!cardContainer) return;
+  
+  // Check if content is actually scrollable
+  var hasScrollableContent = cardContainer.scrollHeight > cardContainer.clientHeight;
+  
+  if (!hasScrollableContent) {
+    cardContainer.classList.remove("scrollable-top");
+    cardContainer.classList.remove("scrollable-bottom");
+    return;
+  }
+  
+  var isScrollableTop = cardContainer.scrollTop > 5; // Small threshold to avoid flickering
+  var isScrollableBottom = cardContainer.scrollTop < (cardContainer.scrollHeight - cardContainer.clientHeight - 5);
+  
+  if (isScrollableTop) {
+    cardContainer.classList.add("scrollable-top");
+  } else {
+    cardContainer.classList.remove("scrollable-top");
+  }
+  
+  if (isScrollableBottom && hasScrollableContent) {
+    cardContainer.classList.add("scrollable-bottom");
+  } else {
+    cardContainer.classList.remove("scrollable-bottom");
+  }
+}
+
+// Function to handle keyboard navigation for card scrolling
+function initializeCardKeyboardNavigation() {
+  document.addEventListener('keydown', function(event) {
+    var cardContainer = document.getElementById("cardContainer");
+    if (!cardContainer) return;
+    
+    // Only handle scroll keys when the card is the focused element or no specific element is focused
+    var activeElement = document.activeElement;
+    var isInputFocused = activeElement && (activeElement.tagName === 'INPUT' || activeElement.tagName === 'TEXTAREA');
+    
+    if (isInputFocused) return; // Don't interfere with input elements
+    
+    var scrollAmount = 50; // pixels to scroll
+    var handled = false;
+    
+    switch(event.key) {
+      case 'ArrowUp':
+        cardContainer.scrollBy(0, -scrollAmount);
+        handled = true;
+        break;
+      case 'ArrowDown':
+        cardContainer.scrollBy(0, scrollAmount);
+        handled = true;
+        break;
+      case 'PageUp':
+        cardContainer.scrollBy(0, -cardContainer.clientHeight * 0.8);
+        handled = true;
+        break;
+      case 'PageDown':
+        cardContainer.scrollBy(0, cardContainer.clientHeight * 0.8);
+        handled = true;
+        break;
+      case 'Home':
+        cardContainer.scrollTop = 0;
+        handled = true;
+        break;
+      case 'End':
+        cardContainer.scrollTop = cardContainer.scrollHeight;
+        handled = true;
+        break;
+    }
+    
+    if (handled) {
+      event.preventDefault();
+      // Update scroll indicators after scrolling
+      updateScrollIndicators();
+    }
+  });
+}
+
 
 function showAnswer() {
+  // Record timestamp to prevent accidental presses
+  lastShowAnswerTime = Date.now();
+  
   if (inErrorReviewMode) {
     displayErrorCard(true);
+  } else if (inStarredReviewMode) {
+    displayStarredCard(true);
   } else {
     displayCurrentCard(true);
   }
@@ -605,8 +767,15 @@ function answerCard(wasCorrect) {
 
 // Handle answer with interval
 function handleAnswerWithInterval(difficulty) {
+  // Prevent accidental button presses within 500ms of showing answer
+  if (Date.now() - lastShowAnswerTime < 500) {
+    return;
+  }
+  
   if (inErrorReviewMode) {
     answerErrorCardWithInterval(difficulty);
+  } else if (inStarredReviewMode) {
+    answerStarredCardWithInterval(difficulty);
   } else {
     var dueCards = getDueCards();
     if (dueCards.length === 0) return;
@@ -666,6 +835,25 @@ function answerErrorCardWithInterval(difficulty) {
   }
 }
 
+// Handle interval-based answer for starred cards
+function answerStarredCardWithInterval(difficulty) {
+  if (currentCardIndex >= starredCardsQueue.length) return;
+  
+  var card = starredCardsQueue[currentCardIndex];
+  
+  // In starred review, we don't affect the regular spaced repetition schedule
+  // This is just for practice, so we just move to the next card
+  currentCardIndex++;
+  
+  saveDeck();
+  
+  if (currentCardIndex >= starredCardsQueue.length) {
+    endStarredReview();
+  } else {
+    displayStarredCard(false);
+  }
+}
+
 // Change the currently selected level
 function changeLevel(level) {
   currentLevel = level;
@@ -714,6 +902,14 @@ function onPageLoad() {
   }
 
   updateProgressDisplay();
+  
+  // Initialize scroll indicators after a short delay to ensure DOM is ready
+  setTimeout(function() {
+    updateScrollIndicators();
+  }, 200);
+  
+  // Initialize keyboard navigation for card scrolling
+  initializeCardKeyboardNavigation();
   
   log("Application initialized");
 }
@@ -784,6 +980,12 @@ function resetProgress() {
   incorrectAnswers = 0;
   incorrectCardsQueue = []; 
   inErrorReviewMode = false;
+  starredCardsQueue = [];
+  inStarredReviewMode = false;
+  
+  // Hide status message if visible
+  var statusElement = document.getElementById("statusMessage");
+  statusElement.style.display = "none";
   
   displayCurrentCard(false);
   saveDeck();
@@ -801,6 +1003,12 @@ function resetAll() {
   inErrorReviewMode = false;
   showingStarredOnly = false; 
   isReversedMode = false;
+  starredCardsQueue = [];
+  inStarredReviewMode = false;
+  
+  // Hide status message if visible
+  var statusElement = document.getElementById("statusMessage");
+  statusElement.style.display = "none";
   
   displayCurrentCard(false);
   saveDeck();
@@ -816,6 +1024,15 @@ function showErrorReviewPrompt() {
   );
 }
 
+// Show prompt to review starred cards
+function showStarredReviewPrompt() {
+  var starredCount = getStarredCardsFromCurrentSession().length;
+  showConfirmation(
+    "You have " + starredCount + " starred cards from this session. Review them now?", 
+    startStarredReview
+  );
+}
+
 // Start error review mode
 function startErrorReview() {
   if (incorrectCardsQueue.length === 0) return;
@@ -828,6 +1045,7 @@ function startErrorReview() {
   statusElement.style.display = "block";
   
   currentCardIndex = 0;
+  lastViewedCardId = null; // Reset view tracking when starting error review
   displayErrorCard(false);
 }
 
@@ -908,6 +1126,21 @@ function answerErrorCard(wasCorrect) {
   }
 }
 
+function answerStarredCard(wasCorrect) {
+  if (currentCardIndex >= starredCardsQueue.length) return;
+  
+  var card = starredCardsQueue[currentCardIndex];
+  
+  // Always move to the next card in starred review (just for practice)
+  currentCardIndex++;
+  
+  if (currentCardIndex >= starredCardsQueue.length) {
+    endStarredReview();
+  } else {
+    displayStarredCard(false);
+  }
+}
+
 function endErrorReview() {
   incorrectCardsQueue = incorrectCardsQueue.filter(function(card) {
     return card !== null;
@@ -925,15 +1158,116 @@ function endErrorReview() {
     );
   } else {
     showToast("All error cards reviewed successfully!", 2000);
-    currentCardIndex = 0;
-    displayCurrentCard(false);
+    // After error review is complete, check for starred cards
+    if (getStarredCardsFromCurrentSession().length > 0 && !inStarredReviewMode) {
+      showStarredReviewPrompt();
+    } else {
+      currentCardIndex = 0;
+      displayCurrentCard(false);
+    }
   }
+  saveDeck();
+}
+
+// Start starred cards review mode
+function startStarredReview() {
+  starredCardsQueue = getStarredCardsFromCurrentSession();
+  if (starredCardsQueue.length === 0) return;
+  
+  inStarredReviewMode = true;
+  showToast("Reviewing starred cards", 2000);
+  
+  var statusElement = document.getElementById("statusMessage");
+  statusElement.textContent = "Starred Cards Review";
+  statusElement.style.display = "block";
+  
+  currentCardIndex = 0;
+  lastViewedCardId = null; // Reset view tracking when starting starred review
+  displayStarredCard(false);
+}
+
+// Display starred card
+function displayStarredCard(showAnswer) {
+  var cardContainer = document.getElementById("cardContainer");
+  var levelBadge = document.getElementById("levelBadge");
+  var frontElement = document.getElementById("cardFront");
+  var backElement = document.getElementById("cardBack");
+  var notesElement = document.getElementById("cardNotes");
+  var showAnswerBtn = document.getElementById("showAnswerBtn");
+  var intervalButtons = document.getElementById("intervalButtons");
+  var starButton = document.getElementById("starButton");
+
+  backElement.style.display = "none";
+  notesElement.style.display = "none";
+  
+  if (currentCardIndex >= starredCardsQueue.length) {
+    endStarredReview();
+    return;
+  }
+  
+  cardContainer.style.display = "block";
+  document.getElementById("cardStats").style.display = "block"; // Show stats
+
+  var card = starredCardsQueue[currentCardIndex];
+  
+  levelBadge.style.display = "block";
+  levelBadge.textContent = card.level;
+  
+  if (isReversedMode) {
+    frontElement.innerHTML = card.back;
+    backElement.textContent = card.front;
+  } else {
+    frontElement.innerHTML = card.front;
+    backElement.textContent = card.back;
+  }
+  
+  notesElement.textContent = card.notes || "";
+  
+  starButton.style.display = "block";
+  updateStarButton(card.starred);
+
+  if (!showAnswer) {
+    // Update view statistics for starred review
+    card.timesViewed = (card.timesViewed || 0) + 1;
+    card.lastViewed = new Date().getTime();
+  }
+  
+  updateCardStats(card);
+  updateScrollIndicators();
+  
+  if (showAnswer) {
+    backElement.style.display = "block";
+    notesElement.style.display = "block";
+    showAnswerBtn.style.display = "none";
+    intervalButtons.style.display = "block";
+    intervalButtons.style.visibility = "visible";
+    setTimeout(updateScrollIndicators, 100);
+  } else {
+    showAnswerBtn.style.display = "block";
+    intervalButtons.style.display = "none";
+  }
+  
+  updateProgressDisplay();
+}
+
+function endStarredReview() {
+  inStarredReviewMode = false;
+  starredCardsQueue = [];
+  
+  var statusElement = document.getElementById("statusMessage");
+  statusElement.style.display = "none";
+  
+  showToast("Starred cards review completed!", 2000);
+  currentCardIndex = 0;
+  displayCurrentCard(false);
   saveDeck();
 }
 
 function handleAnswerCard(wasCorrect) {
   if (inErrorReviewMode) {
     answerErrorCard(wasCorrect);
+  } else if (inStarredReviewMode) {
+    answerStarredCard(wasCorrect);
   } else {
     if (!wasCorrect) {
       answerCard(wasCorrect);
@@ -943,11 +1277,22 @@ function handleAnswerCard(wasCorrect) {
 }
 
 function toggleStarCurrentCard() {
-  var dueCards = getDueCards();
-  if (dueCards.length === 0) return;
+  var card = null;
   
-  var cardIndex = currentCardIndex % dueCards.length;
-  var card = dueCards[cardIndex];
+  if (inStarredReviewMode) {
+    if (currentCardIndex >= starredCardsQueue.length) return;
+    card = starredCardsQueue[currentCardIndex];
+  } else if (inErrorReviewMode) {
+    if (currentCardIndex >= incorrectCardsQueue.length) return;
+    card = incorrectCardsQueue[currentCardIndex];
+  } else {
+    var dueCards = getDueCards();
+    if (dueCards.length === 0) return;
+    var cardIndex = currentCardIndex % dueCards.length;
+    card = dueCards[cardIndex];
+  }
+  
+  if (!card) return;
   
   card.starred = !card.starred;
   

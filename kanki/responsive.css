@@ -21,19 +21,31 @@ body {
   margin-left: auto;
   margin-right: auto;
   padding: calc(20px * var(--device-scale));
+  scroll-behavior: smooth;
+  scrollbar-width: thin;
+  scrollbar-color: #888 #f1f1f1;
 }
 
 /* Text size adjustments */
 .cardFront {
   font-size: calc(2em * var(--device-scale));
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
 }
 
 .cardBack {
   font-size: calc(1.6em * var(--device-scale));
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
 }
 
 .cardNotes {
   font-size: calc(1em * var(--device-scale));
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
 }
 
 /* Button sizing adjustments */
@@ -56,6 +68,9 @@ button {
 @media screen and (orientation: landscape) {
   .card {
     width: 80%;
+    scroll-behavior: smooth;
+    scrollbar-width: thin;
+    scrollbar-color: #888 #f1f1f1;
   }
   
   #levelButtons button {
@@ -76,18 +91,29 @@ button {
     max-width: 85%;
     margin: 25px auto;
     padding: 25px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    scroll-behavior: smooth;
+    scrollbar-width: thin;
+    scrollbar-color: #888 #f1f1f1;
   }
 
   .cardFront {
     font-size: 2.3em;
     min-height: 80px;
     margin-bottom: 30px;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
   }
 
   .cardBack {
     font-size: 1.8em;
     min-height: 65px;
     margin-bottom: 15px;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
   }
 
   #controlButtons {
@@ -132,12 +158,20 @@ button {
     max-width: 85%;
     margin: 25px auto;
     padding: 25px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    scroll-behavior: smooth;
+    scrollbar-width: thin;
+    scrollbar-color: #888 #f1f1f1;
   }
 
   .cardFront {
     font-size: 3em;
     min-height: 110px;
     margin-bottom: 40px;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
   }
 
   .cardBack {
@@ -145,11 +179,17 @@ button {
     min-height: 90px;
     margin-bottom: 20px;
     padding-top: 25px;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
   }
 
   .cardNotes {
     font-size: 1.2em;
     margin-top: 20px;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
   }
 
   .cardStats {
@@ -220,12 +260,20 @@ button {
     max-width: 75%;
     margin: 45px auto;
     padding: 45px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    scroll-behavior: smooth;
+    scrollbar-width: thin;
+    scrollbar-color: #888 #f1f1f1;
   }
 
   .cardFront {
     font-size: 3.8em;
     min-height: 150px;
     margin-bottom: 50px;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
   }
 
   .cardBack {
@@ -233,11 +281,17 @@ button {
     min-height: 120px;
     margin-bottom: 30px;
     padding-top: 35px;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
   }
 
   .cardNotes {
     font-size: 1.6em;
     margin-top: 30px;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
   }
 
   .cardStats {
