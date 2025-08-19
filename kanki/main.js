@@ -1174,6 +1174,9 @@ function startStarredReview() {
   starredCardsQueue = getStarredCardsFromCurrentSession();
   if (starredCardsQueue.length === 0) return;
   
+  // Store previous filter state to restore after starred review
+  var previouslyShowingStarredOnly = showingStarredOnly;
+  
   inStarredReviewMode = true;
   showToast("Reviewing starred cards", 2000);
   
@@ -1258,7 +1261,17 @@ function endStarredReview() {
   statusElement.style.display = "none";
   
   showToast("Starred cards review completed!", 2000);
+  
+  // IMPORTANT: Reset the starred filter to ensure regular cards are shown after review
+  showingStarredOnly = false;
+  var starredFilterBtn = document.getElementById("starredFilterBtn");
+  if (starredFilterBtn) {
+    starredFilterBtn.classList.remove("active");
+  }
+  
+  // Reset the card index and refresh the display
   currentCardIndex = 0;
+  updateLevelDisplay(); // Update the level display to reflect the filter change
   displayCurrentCard(false);
   saveDeck();
 }
