@@ -9,9 +9,25 @@ KAnki is a spaced repetition flashcard application designed specifically for jai
   </a>
 </p>
 
-## ⚠️ Project Status: Active Development
+## ✨ New Update: [Üben + KAnki Workflow](https://ubens.vercel.app/)
 
-**NOTE:** This project is now functional, with universal language support and key features like vocabulary flashcards and level filtering working as intended. Contributions are still welcome to enhance the app further!
+You can now use **Uben** as a companion tool to manage your decks more easily.  
+Since Kindle itself cannot process `.apkg` files directly, the workflow is:  
+
+1. **Find a deck on Anki** (e.g., shared decks online).  
+2. **Import the `.apkg` into Uben**.  
+3. **Edit, add, or update cards** using Uben’s modern UI.  
+4. **Export from Uben** → generates a `kanki_config.js`.  
+5. **Transfer `kanki_config.js` to your Kindle** (replace your existing file).  
+6. Launch KAnki on your Kindle with the new deck.  
+
+**Advantage of this approach:**  
+- You get a **much better UI for editing and creating decks for KAnki** on Uben.  
+- Once you’re done, you just export the ready-to-use configuration to your Kindle.  
+- No need to manually type out decks on Kindle anymore!
+
+**Community**
+- For more information / doubts / suggestions join our discord - https://discord.gg/JtcrpG7ECA
 
 ## Features
 
@@ -186,3 +202,4 @@ kanki/
 
 - Inspired by the Anki spaced repetition software
 - Special thanks to the Kindle jailbreak community
+- For more information / doubts / suggestions join our discord - https://discord.gg/JtcrpG7ECA
