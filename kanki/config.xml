@@ -63,6 +63,7 @@
         <kindle:app name="com.lab126.pillow" value="yes" />
         <kindle:app name="com.lab126.chromebar" value="yes" />
         <kindle:app name="com.lab126.readnow" value="yes" />
+        <kindle:app name="com.kindlemodding.utild" value="yes" />
     </kindle:messaging>
 
     <!-- Removed JQuery, Non-Used JS -->
