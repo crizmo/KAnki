@@ -21,6 +21,8 @@ function initializeConfig() {
   if (typeof KANKI_CONFIG !== 'undefined') {
     appLanguage = KANKI_CONFIG.language || appLanguage;
     appLevels = KANKI_CONFIG.levels || appLevels;
+    ttsLanguageCodeFront = KANKI_CONFIG.ttsLanguageCodeFront;
+    ttsLanguageCodeBack = KANKI_CONFIG.ttsLanguageCodeBack;
     log("Loaded custom configuration: " + appLanguage + " with levels: " + appLevels.join(", "));
   } else {
     log("Using default configuration");
@@ -201,7 +203,7 @@ function createDeck() {
   };
 }
 
-function createCard(front, reading, back, notes, level, difficulty) {
+function createCard(front, reading, back, notes, audioFront, audioBack, level, difficulty) {
   var displayText = front;
   if (reading) {
     displayText = front + " (" + reading + ")";
@@ -211,6 +213,8 @@ function createCard(front, reading, back, notes, level, difficulty) {
     front: displayText,
     back: back,
     notes: notes || "",
+    audioFront: audioFront,
+    audioBack: audioBack,
     level: level || appLevels[0],
     difficulty: difficulty || 0,
     nextReview: new Date().getTime(),
@@ -235,6 +239,8 @@ function createDefaultDeck() {
             word.reading,
             word.back,
             word.notes,
+            word.audioFront,
+            word.audioBack,
             level,
             0
           ));
@@ -245,8 +251,8 @@ function createDefaultDeck() {
     log("Created default deck with " + deck.cards.length + " cards");
   } else {
     log("Warning: VOCABULARY not found, using minimal deck");
-    deck.cards.push(createCard("Example", null, "Translation", "Sample card", appLevels[0], 0));
-    deck.cards.push(createCard("Second", null, "Another translation", "Another sample", appLevels[0], 0));
+    deck.cards.push(createCard("Example", null, "Translation", "Sample card", undefined, undefined, appLevels[0], 0));
+    deck.cards.push(createCard("Second", null, "Another translation", "Another sample", undefined, undefined, appLevels[0], 0));
   }
 
   return deck;
@@ -473,6 +479,7 @@ function displayCurrentCard(showAnswer) {
   var showAnswerBtn = document.getElementById("showAnswerBtn");
   var intervalButtons = document.getElementById("intervalButtons");
   var starButton = document.getElementById("starButton");
+  var playButton = document.getElementById("playButton");
 
   // Hide answer elements by default
   backElement.style.display = "none";
@@ -483,6 +490,7 @@ function displayCurrentCard(showAnswer) {
     frontElement.innerHTML = "<div style='font-size: 0.7em; font-weight: normal; text-align: center; padding: 20px;'><p>No cards due for review!</p><p>Great job! </p></div>";
     levelBadge.style.display = "none";
     showAnswerBtn.style.display = "none";
+    playButton.style.display = "none";
 
     intervalButtons.style.display = "block";
     intervalButtons.style.visibility = "hidden";
@@ -503,17 +511,17 @@ function displayCurrentCard(showAnswer) {
 
   var card = dueCards[currentCardIndex % dueCards.length];
 
-  currentAudioPath = card.audio
-
   levelBadge.style.display = "block";
   levelBadge.textContent = card.level;
 
   if (isReversedMode) {
     frontElement.innerHTML = card.back;
     backElement.textContent = card.front;
+    currentAudioPath = card.audioBack;
   } else {
     frontElement.innerHTML = card.front;
     backElement.textContent = card.back;
+    currentAudioPath = card.audioFront;
   }
 
   notesElement.textContent = card.notes || "";
@@ -545,6 +553,18 @@ function displayCurrentCard(showAnswer) {
     showAnswerBtn.style.display = "block";
     intervalButtons.style.display = "none"; // Hide completely instead of using visibility
   }
+
+  // Show or hide the play button depending on whether the visible side
+  // has an audio file or a configured TTS language.
+  var visible = false;
+  if (currentAudioPath && currentAudioPath.length > 0) {
+    visible = true;
+  } else if (isReversedMode && ttsLanguageCodeBack ) {
+    visible = true;
+  } else if (!isReversedMode && ttsLanguageCodeFront) {
+    visible = true;
+  }
+  playButton.style.display = visible ? "block" : "none";
 
   updateProgressDisplay();
 }
@@ -1320,12 +1340,33 @@ function toggleStarCurrentCard() {
 }
 
 function playSound() {
-  window.kindle.messaging.sendStringMessage(
-    "com.kindlemodding.utild",
-    "runCMD",
-    "/mnt/us/extensions/sox/playfile.sh /mnt/us/music/yne-15581.mp3"
-    //"/mnt/us/extensions/sox/playfile.sh /mnt/us/documents/kanki/assets/audio/1.mp3"
-  );
+  if (currentAudioPath) {
+    window.kindle.messaging.sendStringMessage(
+      "com.kindlemodding.utild",
+      "runCMD",
+      "/mnt/us/extensions/sox/playfile.sh /mnt/us/documents/kanki_audio/" + currentAudioPath
+    );
+  } else if (ttsLanguageCodeFront || ttsLanguageCodeBack) {
+    var languageCode;
+    if (isReversedMode && ttsLanguageCodeBack) {
+      languageCode = ttsLanguageCodeBack;
+      // showToast("isReverseMode" + languageCode, 1500);
+    } else if (!isReversedMode && ttsLanguageCodeFront) {
+      languageCode = ttsLanguageCodeFront;
+      showToast("isNotReverseMode" + languageCode, 1500);
+    } else {
+      showToast(ttsLanguageCodeBack + " " + ttsLanguageCodeFront, 1500);
+      return;
+    }
+    var url = 'https://translate.google.com/translate_tts?ie=UTF-8&tl=' + languageCode + '&client=tw-ob&q=' + encodeURIComponent(document.getElementById("cardFront").innerText);
+    showToast(url, 1500);
+
+    window.kindle.messaging.sendStringMessage(
+      "com.kindlemodding.utild",
+      "runCMD",
+      "/mnt/us/documents/kanki/bin/playaudio.sh -u '" + url + "'"
+    );
+  }
 }
 
 function updateStarButton(isStarred) {

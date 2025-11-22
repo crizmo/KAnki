@@ -42,6 +42,9 @@ Since Kindle itself cannot process `.apkg` files directly, the workflow is:
 - **Centralized configuration**: Easy customization through a single configuration file
 - **E-ink optimized UI**: Fixed element heights and visibility management to minimize screen refreshes
 - **Data persistence**: All study progress and card statistics are automatically saved between sessions
+- **Audio support**: Text-to-speech (TTS) integration for pronunciation practice
+  - Load local mp3 files and play them during reviews
+  - Use Google TTS
 
 ## Technical Limitations
 
@@ -56,6 +59,7 @@ Since Kindle itself cannot process `.apkg` files directly, the workflow is:
 - A jailbroken Kindle device
 - Access to the Kindle's filesystem
 - Basic knowledge of file transfer to Kindle
+- sox installed on your Kindle for audio playback (optional, for TTS/audio features)
 
 ## How to Install KAnki ( New Users )
 1. Clone this repository or download it as a ZIP file
@@ -69,6 +73,10 @@ Since Kindle itself cannot process `.apkg` files directly, the workflow is:
    ```
 7. Disconnect your Kindle from the computer
 8. Open the Kindle's home screen and run the KAnki app
+
+Note: if you want to use audio features utild needs to be running on the kindle.
+The easiest way to accomplish this, is to start KindleForge and close it again.
+This needs to be done only once after a reboot.
 
 ## 🔧 How to Update ( New Users ignore this )
 
@@ -108,6 +116,10 @@ Edit `kanki/js/kanki_config.js` to include your language configuration and vocab
 var KANKI_CONFIG = {
   language: "Spanish",  // Change this to your language name
   levels: ["A1", "A2", "B1"]   // These should match the keys in your VOCABULARY object
+
+  // optional: add TTS language code for audio support
+  ttsLanguageCodeFront: "ru",  // Language code for TTS of the front side (e.g., "ru" for Russian)
+  ttsLanguageCodeBack: "de"    // Language code for TTS of the back side (e.g., "de" for German)
 };
 
 /**
@@ -132,6 +144,14 @@ For languages with different writing systems, use the `reading` property:
 ```javascript
 {"front": "こんにちは", "reading": "konnichiwa", "back": "Hello", "notes": "Greeting"}
 ```
+
+If you want to include audio files for pronunciation, add the `audioFront` and `audioBack` properties:
+
+```javascript
+{"front": "hello", "back": "hola", "audioFront": "hello.mp3", "audioBack": "hola.mp3", "notes": "Greeting"}
+```
+
+Put the audio files in the `kanki_audio` folder. (`/mnt/us/documents/kanki_audio/`)
 
 ## Web Editor for Flashcards by [Kindlemodshelfguy](https://github.com/NemesisHubris)
 
