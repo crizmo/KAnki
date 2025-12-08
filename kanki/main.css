@@ -200,13 +200,12 @@ h1 {
 
 /* Card statistics styling */
 .cardStats {
-  font-size: 0.7em;
-  color: #888;
-  text-align: right;
+  font-size: 0.8em;
+  color: #555;
+  text-align: center;
   margin-top: 15px;
   padding-top: 5px;
   position: relative;
-  font-style: italic;
 }
 
 /* Add a subtle dashed separator that fades at the edges */

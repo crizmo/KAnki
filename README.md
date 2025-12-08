@@ -32,22 +32,27 @@ Since Kindle itself cannot process `.apkg` files directly, the workflow is:
 ## Features
 
 - **Universal language support**: Learn any language by simply changing the font and vocabulary
-- Spaced repetition system to optimize learning
+- **FSRS Spaced Repetition**: Uses the Free Spaced Repetition Scheduler (FSRS) algorithm for optimal learning intervals based on Difficulty, Stability, and Retention probability
 - Customizable vocabulary flashcards with any proficiency levels
 - Filtering by level (JLPT, CEFR, HSK, or any custom system)
 - **Star/favorite system**: Mark important cards and filter by starred items
 - **Reversible cards**: Switch between target language → native and native → target language modes
-- **Per-card statistics**: Track how many times each card has been viewed and review history
+- **Mastery indicators**: View FSRS-based mastery levels with detailed metrics:
+  - **Mastery Levels**: Beginner (<7 days), Learning (7-30 days), Good (30-90 days), Strong (90-365 days), Master (365+ days)
+  - **Stability (S)**: Days until 90% retention probability - higher is better
+  - **Difficulty (D)**: 1-10 scale where 1=easiest, 10=hardest to learn
 - **Error review mode**: Review cards you answered incorrectly right after completing a session
 - **Centralized configuration**: Easy customization through a single configuration file
 - **E-ink optimized UI**: Fixed element heights and visibility management to minimize screen refreshes
 - **Data persistence**: All study progress and card statistics are automatically saved between sessions
+- **Review All Mode**: When no cards are due, option to review all cards for overlearning or browsing
 
 ## Technical Limitations
 
 - The app is designed for jailbroken Kindle devices with very limited browser capabilities
 - Uses older ES5 JavaScript only (no modern JS features)
 - Limited CSS support (no flexbox, grid, CSS variables, etc.)
+- Implements FSRS v4 for advanced spaced repetition scheduling
 
 ## Setup Instructions
 
@@ -70,9 +75,9 @@ Since Kindle itself cannot process `.apkg` files directly, the workflow is:
 7. Disconnect your Kindle from the computer
 8. Open the Kindle's home screen and run the KAnki app
 
-## 🔧 How to Update ( New Users ignore this )
+## 🔧 How to Update ( Existing Users )
 
-1. Back up your current `kanki/js/vocabulary.js` or `kanki/js/kanki_config.js` file if you have been using KAnki, ignore if you are a new user
+1. Back up your current `kanki/js/kanki_config.js` file if you have custom vocabulary
 2. Download the new KAnki release
 3. Replace your old KAnki folder with the new one
 4. Copy your vocabulary data to the new `kanki/js/kanki_config.js` file
@@ -81,9 +86,9 @@ Since Kindle itself cannot process `.apkg` files directly, the workflow is:
 7. Disconnect your Kindle from the computer
 8. Open the Kindle's home screen and run the KAnki app
 9. Hit the `Reload` button after clicking the 3 dots in the top chromebar in the app to apply changes.
-10. Done! Your KAnki app is now updated with the latest features including the new star/favorite functionality
+10. **New FSRS Algorithm**: The app now uses FSRS (Free Spaced Repetition Scheduler) for better spaced repetition. Existing progress will be migrated automatically, but intervals may change for optimal learning.
 
-**Note for users updating to the starred cards version**: When updating from a previous version without the star functionality, all your existing cards will initially be unstarred. You'll need to manually star your important cards after updating.
+**Note for users updating to the FSRS version**: The scheduling algorithm has been upgraded to FSRS v4, which provides more accurate intervals based on your learning patterns. Your existing cards will continue to work, and the algorithm will adapt over time.
 
 ## Customizing for Your Language
 
