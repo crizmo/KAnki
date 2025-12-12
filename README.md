@@ -26,6 +26,12 @@ Since Kindle itself cannot process `.apkg` files directly, the workflow is:
 - Once you’re done, you just export the ready-to-use configuration to your Kindle.  
 - No need to manually type out decks on Kindle anymore!
 
+**KAnki Community** <br /> 
+
+<img width="500" height="auto" alt="image" src="https://github.com/user-attachments/assets/73dfbeae-e777-43b9-b8a3-09324e20c8ad" />
+
+Share your language / study material configurations with others with the new KAnki community update on Üben
+
 **Community**
 - For more information / doubts / suggestions join our discord - https://discord.gg/JtcrpG7ECA
 
