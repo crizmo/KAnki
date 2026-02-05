@@ -9,7 +9,7 @@ KAnki is a spaced repetition flashcard application designed specifically for jai
   </a>
 </p>
 
-## ✨ New Update: [Üben + KAnki Workflow](https://ubens.vercel.app/)
+## ✨ New Update: [Üben + KAnki Workflow](https://www.uben.online/)
 
 You can now use **Uben** as a companion tool to manage your decks more easily.  
 Since Kindle itself cannot process `.apkg` files directly, the workflow is:  
