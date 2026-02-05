@@ -28,8 +28,8 @@ Since Kindle itself cannot process `.apkg` files directly, the workflow is:
 
 **KAnki Community** <br /> 
 
-<img width="450" height="auto" alt="image" src="https://github.com/user-attachments/assets/f0d6f784-b7b0-4f6f-85a8-8a8dce67afc2" />
-<img width="450" height="auto" alt="image" src="https://github.com/user-attachments/assets/bf23c7dc-4a0e-4d7e-8b9e-1a1588cd2487" />
+<img width="400" height="auto" alt="image" src="https://github.com/user-attachments/assets/f0d6f784-b7b0-4f6f-85a8-8a8dce67afc2" />
+<img width="400" height="auto" alt="image" src="https://github.com/user-attachments/assets/bf23c7dc-4a0e-4d7e-8b9e-1a1588cd2487" />
 
 Share your language / study material configurations with others with the new KAnki community update on Üben
 
