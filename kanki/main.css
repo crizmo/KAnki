@@ -179,6 +179,20 @@ h1 {
   hyphens: auto; /* Add hyphenation for better text wrapping */
 }
 
+.cardImage {
+  text-align: center;
+  margin-bottom: 15px;
+  max-width: 100%;
+  max-height: 200px;
+}
+
+.cardImage img {
+  max-width: 100%;
+  max-height: 200px;
+  object-fit: contain;
+  border-radius: 8px;
+}
+
 .cardBack {
   font-size: 1.5em;
   margin-bottom: 10px;
@@ -492,4 +506,86 @@ h1 {
 #reverseToggleBtn.active {
   background-color: #555;
   color: white;
+}
+
+/* Image content styling */
+.content-image-container {
+  text-align: center;
+  margin: 15px 0;
+  padding: 10px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  position: relative;
+}
+
+.image-loading {
+  color: #666;
+  font-size: 0.9em;
+  padding: 20px;
+  text-align: center;
+  font-style: italic;
+}
+
+.content-image {
+  max-width: 100%;
+  max-height: 280px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  border-radius: 8px;
+  display: block;
+  margin: 0 auto;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transition: transform 0.2s ease;
+  opacity: 0;
+  animation: fadeIn 0.3s ease forwards;
+}
+
+.content-image:hover {
+  transform: scale(1.02);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Dedicated card image styling */
+#cardImage {
+  text-align: center;
+  margin: 20px 0;
+  padding: 15px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+  border-radius: 15px;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.card-image-loading {
+  color: #666;
+  font-size: 0.9em;
+  padding: 20px;
+  text-align: center;
+  font-style: italic;
+}
+
+#cardImage img {
+  max-width: 100%;
+  max-height: 320px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  border-radius: 10px;
+  display: block;
+  margin: 0 auto;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  transition: all 0.3s ease;
+  opacity: 0;
+  animation: fadeIn 0.3s ease forwards;
+}
+
+#cardImage img:hover {
+  transform: scale(1.03);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
 }

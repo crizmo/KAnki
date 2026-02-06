@@ -739,3 +739,64 @@ button:focus {
   font-size: 0.9em;
   margin: 5px;
 }
+
+/* Responsive image styling */
+@media screen and (max-width: 600px) {
+  .content-image-container {
+    margin: 10px 0;
+    padding: 8px;
+  }
+  
+  .content-image {
+    max-height: 200px;
+  }
+  
+  #cardImage {
+    margin: 15px 0;
+    padding: 10px;
+  }
+  
+  #cardImage img {
+    max-height: 220px;
+  }
+}
+
+@media screen and (min-width: 601px) and (max-width: 850px) {
+  .content-image-container {
+    margin: 12px 0;
+    padding: 10px;
+  }
+  
+  .content-image {
+    max-height: 240px;
+  }
+  
+  #cardImage {
+    margin: 18px 0;
+    padding: 12px;
+  }
+  
+  #cardImage img {
+    max-height: 260px;
+  }
+}
+
+@media screen and (min-width: 1050px) {
+  .content-image-container {
+    margin: 20px 0;
+    padding: 15px;
+  }
+  
+  .content-image {
+    max-height: 320px;
+  }
+  
+  #cardImage {
+    margin: 25px 0;
+    padding: 18px;
+  }
+  
+  #cardImage img {
+    max-height: 360px;
+  }
+}

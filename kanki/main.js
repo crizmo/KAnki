@@ -1,3 +1,36 @@
+// Helper function to detect if a string is an image URL
+function isImageUrl(str) {
+  if (!str || typeof str !== 'string') return false;
+  var trimmed = str.trim();
+  if (!(trimmed.startsWith('http://') || trimmed.startsWith('https://'))) return false;
+  return (trimmed.match(/\.(jpg|jpeg|png|gif|bmp|webp)/i) !== null ||
+          trimmed.includes('imgur') || trimmed.includes('picsum') || trimmed.includes('placeholder'));
+}
+
+// Helper function to render content that can be text or image
+function renderContent(content) {
+  if (!content) return "";
+  
+  var str = String(content).trim();
+  
+  // Check if this is an image URL
+  if (str.startsWith('http://') || str.startsWith('https://')) {
+    // Check if it looks like an image
+    if (str.match(/\.(jpg|jpeg|png|gif|bmp|webp)(\?.*)?$/i) !== null) {
+      // It's definitely an image - direct file extension match
+      return '<div class="content-image-container"><div class="image-loading">Loading image...</div><img src="' + str + '" alt="card image" class="content-image" onload="this.previousElementSibling.style.display=\'none\'" onerror="this.previousElementSibling.textContent=\'Failed to load image\'; this.style.display=\'none\'" /></div>';
+    }
+    
+    // Check for service-based image URLs
+    if (str.includes('placeholder') || str.includes('picsum') || str.includes('imgur')) {
+      return '<div class="content-image-container"><div class="image-loading">Loading image...</div><img src="' + str + '" alt="card image" class="content-image" onload="this.previousElementSibling.style.display=\'none\'" onerror="this.previousElementSibling.textContent=\'Failed to load image\'; this.style.display=\'none\'" /></div>';
+    }
+  }
+  
+  // If we get here, treat it as text
+  return str;
+}
+
 // Globals
 var currentCardIndex = 0;
 var correctAnswers = 0;
@@ -13,6 +46,8 @@ var deviceScaleFactor = 1.0; // New variable for device scaling
 var lastShowAnswerTime = 0; // Timestamp to prevent accidental button presses after showing answer
 var starredCardsQueue = []; // Queue for starred cards review
 var inStarredReviewMode = false; // Flag for starred review mode
+var appLanguage = "Japanese"; // Default language
+var appLevels = ["N5", "N4"]; // Default levels
 
 // Initialize configuration from vocabulary.js if available
 function initializeConfig() {
@@ -199,7 +234,7 @@ function createDeck() {
   };
 }
 
-function createCard(front, reading, back, notes, level, difficulty) {
+function createCard(front, reading, back, notes, level, difficulty, image) {
   var displayText = front;
   if (reading) {
     displayText = front + " (" + reading + ")";
@@ -215,7 +250,8 @@ function createCard(front, reading, back, notes, level, difficulty) {
     history: [],
     starred: false,
     timesViewed: 0,
-    lastViewed: null
+    lastViewed: null,
+    image: image || null
   };
 }
 
@@ -228,13 +264,15 @@ function createDefaultDeck() {
       if (VOCABULARY.hasOwnProperty(level)) {
         for (var i = 0; i < VOCABULARY[level].length; i++) {
           var word = VOCABULARY[level][i];
+          console.log("Creating card for word:", word.front, "image:", word.image);
           deck.cards.push(createCard(
             word.front, 
             word.reading,
             word.back, 
             word.notes, 
             level, 
-            0
+            0,
+            word.image
           ));
         }
       }
@@ -243,8 +281,8 @@ function createDefaultDeck() {
     log("Created default deck with " + deck.cards.length + " cards");
   } else {
     log("Warning: VOCABULARY not found, using minimal deck");
-    deck.cards.push(createCard("Example", null, "Translation", "Sample card", appLevels[0], 0));
-    deck.cards.push(createCard("Second", null, "Another translation", "Another sample", appLevels[0], 0));
+    deck.cards.push(createCard("Example", null, "Translation", "Sample card", appLevels[0], 0, null));
+    deck.cards.push(createCard("Second", null, "Another translation", "Another sample", appLevels[0], 0, null));
   }
   
   return deck;
@@ -460,11 +498,14 @@ function getStarredCardsFromCurrentSession() {
 
 // Display current card - optimized to update DOM elements instead of recreating them
 function displayCurrentCard(showAnswer) {
+  console.log("displayCurrentCard called with showAnswer:", showAnswer);
   var dueCards = getDueCards();
+  console.log("dueCards length:", dueCards.length);
   
   // Get DOM elements once 
   var cardContainer = document.getElementById("cardContainer");
   var levelBadge = document.getElementById("levelBadge");
+  var cardImage = document.getElementById("cardImage");
   var frontElement = document.getElementById("cardFront");
   var backElement = document.getElementById("cardBack");
   var notesElement = document.getElementById("cardNotes");
@@ -473,6 +514,7 @@ function displayCurrentCard(showAnswer) {
   var starButton = document.getElementById("starButton");
   
   // Hide answer elements by default
+  cardImage.style.display = "none";
   backElement.style.display = "none";
   notesElement.style.display = "none";
   
@@ -505,11 +547,21 @@ function displayCurrentCard(showAnswer) {
   levelBadge.textContent = card.level;
   
   if (isReversedMode) {
-    frontElement.innerHTML = card.back;
-    backElement.textContent = card.front;
+    frontElement.innerHTML = renderContent(card.back);
+    backElement.innerHTML = renderContent(card.front);
   } else {
-    frontElement.innerHTML = card.front;
-    backElement.textContent = card.back;
+    frontElement.innerHTML = renderContent(card.front);
+    backElement.innerHTML = renderContent(card.back);
+  }
+  
+  // Handle image display
+  if (card.image) {
+    var imageBasePath = (typeof KANKI_CONFIG !== 'undefined' && KANKI_CONFIG.imageBasePath) ? KANKI_CONFIG.imageBasePath : "deckimages/";
+    var imageSrc = card.image.startsWith('http') ? card.image : imageBasePath + card.image;
+    cardImage.innerHTML = '<div class="card-image-loading">Loading image...</div><img src="' + imageSrc + '" alt="Card image" loading="lazy" onload="this.previousElementSibling.style.display=\'none\'" onerror="this.previousElementSibling.textContent=\'Failed to load image\'; this.style.display=\'none\'; setTimeout(() => {this.previousElementSibling.style.display=\'none\'}, 3000)">';
+    cardImage.style.display = "block";
+  } else {
+    cardImage.style.display = "none";
   }
   
   notesElement.textContent = card.notes || "";
@@ -1077,14 +1129,14 @@ function displayErrorCard(showAnswer) {
   levelBadge.textContent = card.level;
 
   if (isReversedMode) {
-    frontElement.innerHTML = card.back;
-    backElement.textContent = card.front;
+    frontElement.innerHTML = renderContent(card.back);
+    backElement.innerHTML = renderContent(card.front);
   } else {
-    frontElement.innerHTML = card.front;
-    backElement.textContent = card.back;
+    frontElement.innerHTML = renderContent(card.front);
+    backElement.innerHTML = renderContent(card.back);
   }
   
-  notesElement.textContent = card.notes || "";
+  notesElement.innerHTML = renderContent(card.notes || "");
   
   starButton.style.display = "block";
   updateStarButton(card.starred);
@@ -1217,14 +1269,20 @@ function displayStarredCard(showAnswer) {
   levelBadge.textContent = card.level;
   
   if (isReversedMode) {
-    frontElement.innerHTML = card.back;
-    backElement.textContent = card.front;
+    var frontContent = renderContent(card.back);
+    var backContent = renderContent(card.front);
+    console.log("Reversed mode - front:", frontContent, "back:", backContent);
+    frontElement.innerHTML = frontContent;
+    backElement.innerHTML = backContent;
   } else {
-    frontElement.innerHTML = card.front;
-    backElement.textContent = card.back;
+    var frontContent = renderContent(card.front);
+    var backContent = renderContent(card.back);
+    console.log("Normal mode - front:", frontContent, "back:", backContent);
+    frontElement.innerHTML = frontContent;
+    backElement.innerHTML = backContent;
   }
   
-  notesElement.textContent = card.notes || "";
+  notesElement.innerHTML = renderContent(card.notes || "");
   
   starButton.style.display = "block";
   updateStarButton(card.starred);
