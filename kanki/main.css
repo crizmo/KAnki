@@ -480,6 +480,18 @@ h1 {
   padding: 5px;
 }
 
+.playButton {
+  position: absolute;
+  top: 10px;
+  left: 400px;
+  background: none;
+  border: none;
+  font-size: 1.5em;
+  cursor: pointer;
+  z-index: 10;
+  padding: 5px;
+}
+
 .starButton.starred {
   color: #555; 
 }
