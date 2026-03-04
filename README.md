@@ -56,7 +56,7 @@ Share your language / study material configurations with others with the new KAn
 - Uses older ES5 JavaScript only (no modern JS features)
 - Limited CSS support (no flexbox, grid, CSS variables, etc.)
 
-## Setup Instructions
+## [Setup Instructions | Docs](https://crizmo-kanki-44.mintlify.app/introduction)
 
 ## Prerequisites
 
